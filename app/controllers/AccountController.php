@@ -370,6 +370,7 @@ class AccountController {
         $products = $productModel->getProducts();
         $categories = $categoryModel->getCategories();
         $users = $this->accountModel->getAccounts();
+        $totalUsers = count($users);
 
         // Lấy danh sách các đơn hàng và tổng tiền
         $queryOrders = "SELECT o.id, o.name, o.phone, o.address, o.created_at, o.status, a.username as account_name,
@@ -380,6 +381,7 @@ class AccountController {
         $stmtOrders = $this->db->prepare($queryOrders);
         $stmtOrders->execute();
         $orders = $stmtOrders->fetchAll(PDO::FETCH_OBJ);
+        $totalOrders = count($orders);
 
         // Lấy chi tiết đơn đặt hàng phục vụ xem nhanh
         $orderDetails = [];

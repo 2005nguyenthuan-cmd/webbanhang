@@ -1,502 +1,785 @@
 <?php include 'app/views/shares/header.php'; ?>
+<?php $activeTab = $_GET['tab'] ?? 'orders'; ?>
 
-<?php
-$activeTab = $_GET['tab'] ?? 'orders';
-?>
+<!-- ===================== ADMIN DASHBOARD ===================== -->
 
-<div class="row mb-5">
-    <div class="col-12">
-        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
-            <div>
-                <h1 class="font-weight-bold mb-1" style="color: var(--text-main); letter-spacing: -1px;">Bảng Điều Khiển Quản Trị</h1>
-                <p class="text-muted mb-0">Quản lý bán hàng, sản phẩm, danh mục và phân quyền tài khoản</p>
-            </div>
-            <a href="<?php echo BASE_URL; ?>/Product/" class="btn btn-outline-premium mt-2" style="border-radius: var(--radius-md);">
-                <i class="fa-solid fa-arrow-left mr-2"></i> Quay lại cửa hàng
-            </a>
+<!-- Page Header -->
+<div class="adm-header mb-4">
+    <div class="adm-header__left">
+        <div class="adm-header__icon">
+            <i class="fa-solid fa-gauge-high"></i>
         </div>
-        
-        <!-- Statistics Section -->
-        <div class="row mb-4">
-            <div class="col-md-3 mb-3">
-                <div class="premium-card p-4 d-flex align-items-center" style="border-radius: var(--radius-md); background: linear-gradient(135deg, rgba(79, 70, 229, 0.1), rgba(6, 182, 212, 0.05)); border: 1px solid var(--border-color);">
-                    <div class="rounded-circle d-flex align-items-center justify-content-center bg-primary text-white" style="width: 50px; height: 50px; font-size: 20px;">
-                        <i class="fa-solid fa-coins"></i>
-                    </div>
-                    <div class="ml-3">
-                        <div class="small text-muted font-weight-bold">DOANH THU HỆ THỐNG</div>
-                        <h4 class="font-weight-bold mb-0 text-danger mt-1"><?php echo number_format($totalRevenue, 0, ',', '.'); ?> ₫</h4>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3 mb-3">
-                <div class="premium-card p-4 d-flex align-items-center" style="border-radius: var(--radius-md); background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(6, 182, 212, 0.05)); border: 1px solid var(--border-color);">
-                    <div class="rounded-circle d-flex align-items-center justify-content-center bg-success text-white" style="width: 50px; height: 50px; font-size: 20px;">
-                        <i class="fa-solid fa-receipt"></i>
-                    </div>
-                    <div class="ml-3">
-                        <div class="small text-muted font-weight-bold">TỔNG ĐƠN HÀNG</div>
-                        <h4 class="font-weight-bold mb-0 text-success mt-1"><?php echo $totalOrders; ?> đơn hàng</h4>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3 mb-3">
-                <div class="premium-card p-4 d-flex align-items-center" style="border-radius: var(--radius-md); background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(239, 68, 68, 0.05)); border: 1px solid var(--border-color);">
-                    <div class="rounded-circle d-flex align-items-center justify-content-center bg-warning text-white" style="width: 50px; height: 50px; font-size: 20px;">
-                        <i class="fa-solid fa-users"></i>
-                    </div>
-                    <div class="ml-3">
-                        <div class="small text-muted font-weight-bold">TỔNG THÀNH VIÊN</div>
-                        <h4 class="font-weight-bold mb-0 text-warning mt-1"><?php echo $totalUsers; ?> tài khoản</h4>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3 mb-3">
-                <div class="premium-card p-4 d-flex align-items-center" style="border-radius: var(--radius-md); background: linear-gradient(135deg, rgba(6, 182, 212, 0.1), rgba(79, 70, 229, 0.05)); border: 1px solid var(--border-color);">
-                    <div class="rounded-circle d-flex align-items-center justify-content-center bg-info text-white" style="width: 50px; height: 50px; font-size: 20px;">
-                        <i class="fa-solid fa-mobile-screen"></i>
-                    </div>
-                    <div class="ml-3">
-                        <div class="small text-muted font-weight-bold">TỔNG SẢN PHẨM</div>
-                        <h4 class="font-weight-bold mb-0 text-info mt-1"><?php echo count($products); ?> sản phẩm</h4>
-                    </div>
-                </div>
-            </div>
+        <div>
+            <h1 class="adm-header__title">Bảng Điều Khiển</h1>
+            <p class="adm-header__sub">Quản lý toàn bộ hệ thống TechStore</p>
         </div>
-        
-        <!-- Dashboard Navigation Tabs -->
-        <div class="premium-card p-3 mb-4" style="border-radius: var(--radius-md);">
-            <ul class="nav nav-pills" id="adminTabs" role="tablist" style="gap: 8px;">
-                <li class="nav-item">
-                    <a class="nav-link py-3 px-4 font-weight-bold <?php echo $activeTab === 'orders' ? 'active' : ''; ?>" 
-                       href="?tab=orders" style="border-radius: var(--radius-sm); transition: var(--transition);">
-                        <i class="fa-solid fa-receipt mr-2"></i> Quản lý Đơn hàng
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link py-3 px-4 font-weight-bold <?php echo $activeTab === 'products' ? 'active' : ''; ?>" 
-                       href="?tab=products" style="border-radius: var(--radius-sm); transition: var(--transition);">
-                        <i class="fa-solid fa-boxes-stacked mr-2"></i> Quản lý Sản phẩm
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link py-3 px-4 font-weight-bold <?php echo $activeTab === 'categories' ? 'active' : ''; ?>" 
-                       href="?tab=categories" style="border-radius: var(--radius-sm); transition: var(--transition);">
-                        <i class="fa-solid fa-tags mr-2"></i> Quản lý Danh mục
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link py-3 px-4 font-weight-bold <?php echo $activeTab === 'users' ? 'active' : ''; ?>" 
-                       href="?tab=users" style="border-radius: var(--radius-sm); transition: var(--transition);">
-                        <i class="fa-solid fa-users-gear mr-2"></i> Phân cấp Tài khoản
-                    </a>
-                </li>
-            </ul>
+    </div>
+    <a href="<?php echo BASE_URL; ?>/Product/" class="adm-back-btn">
+        <i class="fa-solid fa-store mr-2"></i> Xem cửa hàng
+    </a>
+</div>
+
+<!-- ── STAT CARDS ─────────────────────────────────────────── -->
+<div class="row adm-stats mb-4">
+
+    <!-- Revenue -->
+    <div class="col-lg-3 col-sm-6 mb-3">
+        <div class="stat-card stat-card--indigo">
+            <div class="stat-card__icon"><i class="fa-solid fa-coins"></i></div>
+            <div class="stat-card__body">
+                <div class="stat-card__label">Doanh thu</div>
+                <div class="stat-card__value">
+                    <?php echo number_format($totalRevenue ?? 0, 0, ',', '.'); ?> ₫
+                </div>
+                <div class="stat-card__hint">Trừ đơn đã hủy</div>
+            </div>
+            <div class="stat-card__bg-icon"><i class="fa-solid fa-coins"></i></div>
         </div>
+    </div>
 
-        <!-- Dashboard Content Areas -->
-        <div class="tab-content">
-            
-            <!-- TAB 1: ORDERS -->
-            <div class="tab-pane fade show <?php echo $activeTab === 'orders' ? 'active' : ''; ?>">
-                <div class="premium-card p-4">
-                    <h3 class="font-weight-bold mb-4" style="color: var(--text-main); font-size: 20px;"><i class="fa-solid fa-receipt mr-2 text-primary"></i>Danh Sách Đơn Hàng</h3>
-                    
-                    <?php if (!empty($orders)): ?>
-                        <div class="table-responsive">
-                            <table class="table table-hover align-middle">
-                                <thead>
-                                    <tr>
-                                        <th>Mã ĐH</th>
-                                        <th>Khách hàng</th>
-                                        <th>Thông tin liên hệ</th>
-                                        <th>Tổng tiền</th>
-                                        <th>Ngày đặt</th>
-                                        <th>Trạng thái</th>
-                                        <th class="text-right">Hành động</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php foreach ($orders as $order): ?>
-                                        <tr>
-                                            <td class="font-weight-bold">#<?php echo $order->id; ?></td>
-                                            <td>
-                                                <div class="font-weight-bold text-main"><?php echo htmlspecialchars($order->name); ?></div>
-                                                <?php if (!empty($order->account_name)): ?>
-                                                    <span class="badge badge-light text-muted small"><i class="fa-regular fa-user mr-1"></i><?php echo htmlspecialchars($order->account_name); ?></span>
-                                                <?php endif; ?>
-                                            </td>
-                                            <td>
-                                                <div class="small"><i class="fa-solid fa-phone text-muted mr-1"></i><?php echo htmlspecialchars($order->phone); ?></div>
-                                                <div class="small text-muted text-truncate" style="max-width: 250px;"><i class="fa-solid fa-location-dot mr-1"></i><?php echo htmlspecialchars($order->address); ?></div>
-                                            </td>
-                                            <td class="font-weight-bold text-danger"><?php echo number_format($order->total_amount, 0, ',', '.'); ?> ₫</td>
-                                            <td class="small"><?php echo date('d/m/Y H:i', strtotime($order->created_at)); ?></td>
-                                            <td>
-                                                <?php 
-                                                $badgeClass = 'badge-warning';
-                                                if ($order->status === 'Đang giao hàng') $badgeClass = 'badge-info';
-                                                elseif ($order->status === 'Đã giao') $badgeClass = 'badge-success';
-                                                elseif ($order->status === 'Đã hủy') $badgeClass = 'badge-danger';
-                                                ?>
-                                                <span class="badge <?php echo $badgeClass; ?> p-2 font-weight-bold" style="border-radius: 4px; font-size: 12px;">
-                                                    <?php echo htmlspecialchars($order->status); ?>
-                                                </span>
-                                            </td>
-                                            <td class="text-right">
-                                                <div class="d-flex justify-content-end align-items-center" style="gap: 8px;">
-                                                    <!-- Xem chi tiết nhanh -->
-                                                    <button class="btn btn-sm btn-light border" data-toggle="collapse" data-target="#order-detail-<?php echo $order->id; ?>" title="Xem sản phẩm">
-                                                        <i class="fa-regular fa-eye"></i> Chi tiết
-                                                    </button>
-                                                    
-                                                    <!-- Form Cập nhật Trạng thái -->
-                                                    <form action="<?php echo BASE_URL; ?>/Account/updateOrderStatus" method="POST" class="d-flex align-items-center" style="gap: 4px;">
-                                                        <input type="hidden" name="order_id" value="<?php echo $order->id; ?>">
-                                                        <select name="status" class="form-control form-control-sm" style="width: 130px; height: 31px; border-radius: 4px; font-size: 12px; font-weight: 500;">
-                                                            <option value="Đang xử lý" <?php echo $order->status === 'Đang xử lý' ? 'selected' : ''; ?>>Đang xử lý</option>
-                                                            <option value="Đang giao hàng" <?php echo $order->status === 'Đang giao hàng' ? 'selected' : ''; ?>>Đang giao hàng</option>
-                                                            <option value="Đã giao" <?php echo $order->status === 'Đã giao' ? 'selected' : ''; ?>>Đã giao</option>
-                                                            <option value="Đã hủy" <?php echo $order->status === 'Đã hủy' ? 'selected' : ''; ?>>Đã hủy</option>
-                                                        </select>
-                                                        <button type="submit" class="btn btn-sm btn-premium py-1 px-2" style="border-radius: 4px; font-size: 11px; height: 31px;">Lưu</button>
-                                                    </form>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        
-                                        <!-- Bảng mở rộng Chi tiết sản phẩm trong đơn hàng -->
-                                        <tr class="collapse" id="order-detail-<?php echo $order->id; ?>" style="background-color: var(--light);">
-                                            <td colspan="7" class="p-4" style="border-left: 4px solid var(--primary);">
-                                                <h6 class="font-weight-bold mb-3"><i class="fa-solid fa-basket-shopping mr-2 text-primary"></i>Chi tiết sản phẩm đơn hàng #<?php echo $order->id; ?></h6>
-                                                <div class="row">
-                                                    <div class="col-md-8">
-                                                        <table class="table table-sm table-borderless mb-0">
-                                                            <thead>
-                                                                <tr class="text-muted small" style="border-bottom: 1px solid var(--border-color);">
-                                                                    <th>Sản phẩm</th>
-                                                                    <th class="text-center">Số lượng</th>
-                                                                    <th class="text-right">Đơn giá</th>
-                                                                    <th class="text-right">Thành tiền</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                                <?php foreach ($orderDetails[$order->id] as $item): ?>
-                                                                    <tr style="border-bottom: 1px dashed var(--border-color);">
-                                                                        <td class="d-flex align-items-center py-2">
-                                                                            <?php if (!empty($item->product_image)): ?>
-                                                                                <img src="<?php echo (strpos($item->product_image, 'http') === 0) ? $item->product_image : BASE_URL . '/' . $item->product_image; ?>" style="width: 40px; height: 40px; object-fit: contain; margin-right: 10px; background: white; padding: 2px; border: 1px solid var(--border-color); border-radius: 4px;">
-                                                                            <?php endif; ?>
-                                                                            <span class="font-weight-bold small text-main"><?php echo htmlspecialchars($item->product_name ?? 'Sản phẩm đã bị xóa'); ?></span>
-                                                                        </td>
-                                                                        <td class="text-center py-2 small">x<?php echo $item->quantity; ?></td>
-                                                                        <td class="text-right py-2 small"><?php echo number_format($item->price, 0, ',', '.'); ?> ₫</td>
-                                                                        <td class="text-right py-2 font-weight-bold text-danger small"><?php echo number_format($item->quantity * $item->price, 0, ',', '.'); ?> ₫</td>
-                                                                    </tr>
-                                                                <?php endforeach; ?>
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                    <div class="col-md-4">
-                                                        <div class="card p-3" style="border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--card-bg);">
-                                                            <div class="small font-weight-bold mb-2">ĐỊA CHỈ NHẬN HÀNG</div>
-                                                            <div class="small text-muted mb-1">Người nhận: <?php echo htmlspecialchars($order->name); ?></div>
-                                                            <div class="small text-muted mb-1">Điện thoại: <?php echo htmlspecialchars($order->phone); ?></div>
-                                                            <div class="small text-muted">Địa chỉ: <?php echo htmlspecialchars($order->address); ?></div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                </tbody>
-                            </table>
-                        </div>
-                    <?php else: ?>
-                        <div class="text-center py-5 text-muted">
-                            <i class="fa-solid fa-receipt fa-3x mb-3"></i>
-                            <h5>Chưa có đơn hàng nào được đặt</h5>
-                            <p class="small">Các đơn hàng đặt từ khách hàng sẽ hiển thị tại đây.</p>
-                        </div>
-                    <?php endif; ?>
-                </div>
+    <!-- Orders -->
+    <div class="col-lg-3 col-sm-6 mb-3">
+        <div class="stat-card stat-card--emerald">
+            <div class="stat-card__icon"><i class="fa-solid fa-receipt"></i></div>
+            <div class="stat-card__body">
+                <div class="stat-card__label">Đơn hàng</div>
+                <div class="stat-card__value"><?php echo $totalOrders ?? 0; ?></div>
+                <div class="stat-card__hint">Tổng tất cả đơn</div>
             </div>
+            <div class="stat-card__bg-icon"><i class="fa-solid fa-receipt"></i></div>
+        </div>
+    </div>
 
-            <!-- TAB 2: PRODUCTS -->
-            <div class="tab-pane fade show <?php echo $activeTab === 'products' ? 'active' : ''; ?>">
-                <div class="premium-card p-4">
-                    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap" style="gap: 10px;">
-                        <h3 class="font-weight-bold mb-0" style="color: var(--text-main); font-size: 20px;"><i class="fa-solid fa-boxes-stacked mr-2 text-primary"></i>Danh Sách Sản Phẩm</h3>
-                        <a href="<?php echo BASE_URL; ?>/Product/add" class="btn btn-premium btn-sm" style="border-radius: var(--radius-md);">
-                            <i class="fa-solid fa-plus mr-1"></i> Đăng sản phẩm mới
-                        </a>
-                    </div>
-                    
-                    <?php if (!empty($products)): ?>
-                        <div class="table-responsive">
-                            <table class="table table-hover align-middle">
-                                <thead>
-                                    <tr>
-                                        <th>Ảnh</th>
-                                        <th>Tên sản phẩm</th>
-                                        <th>Danh mục</th>
-                                        <th>Giá bán</th>
-                                        <th>Mô tả</th>
-                                        <th class="text-right">Thao tác</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php foreach ($products as $product): ?>
-                                        <tr>
-                                            <td>
-                                                <?php if ($product->image): ?>
-                                                    <img src="<?php echo (strpos($product->image, 'http') === 0) ? $product->image : BASE_URL . '/' . $product->image; ?>" style="width: 50px; height: 50px; object-fit: contain; background: white; padding: 2px; border: 1px solid var(--border-color); border-radius: 6px;">
-                                                <?php else: ?>
-                                                    <img src="https://via.placeholder.com/50x50" style="width: 50px; height: 50px; border-radius: 6px;">
-                                                <?php endif; ?>
-                                            </td>
-                                            <td class="font-weight-bold text-main"><?php echo htmlspecialchars($product->name); ?></td>
-                                            <td>
-                                                <span class="badge badge-primary px-2 py-1" style="font-size: 11px; border-radius: 4px;">
-                                                    <?php echo htmlspecialchars($product->category_name ?? 'Không phân loại'); ?>
-                                                </span>
-                                            </td>
-                                            <td class="font-weight-bold text-danger"><?php echo number_format($product->price, 0, ',', '.'); ?> ₫</td>
-                                            <td class="text-muted small text-truncate" style="max-width: 250px;"><?php echo htmlspecialchars($product->description); ?></td>
-                                            <td class="text-right">
-                                                <a href="<?php echo BASE_URL; ?>/Product/edit/<?php echo $product->id; ?>" class="btn btn-sm btn-warning text-white mr-1" title="Sửa sản phẩm" style="border-radius: 4px;">
-                                                    <i class="fa-solid fa-pen"></i>
-                                                </a>
-                                                <a href="<?php echo BASE_URL; ?>/Product/delete/<?php echo $product->id; ?>" class="btn btn-sm btn-danger text-white" onclick="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này?');" title="Xóa sản phẩm" style="border-radius: 4px;">
-                                                    <i class="fa-solid fa-trash"></i>
-                                                </a>
-                                            </td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                </tbody>
-                            </table>
-                        </div>
-                    <?php else: ?>
-                        <div class="text-center py-5 text-muted">
-                            <i class="fa-solid fa-box-open fa-3x mb-3"></i>
-                            <h5>Cửa hàng trống</h5>
-                            <a href="<?php echo BASE_URL; ?>/Product/add" class="btn btn-premium mt-3">Thêm ngay</a>
-                        </div>
-                    <?php endif; ?>
-                </div>
+    <!-- Members -->
+    <div class="col-lg-3 col-sm-6 mb-3">
+        <div class="stat-card stat-card--amber">
+            <div class="stat-card__icon"><i class="fa-solid fa-users"></i></div>
+            <div class="stat-card__body">
+                <div class="stat-card__label">Thành viên</div>
+                <div class="stat-card__value"><?php echo $totalUsers ?? count($users); ?></div>
+                <div class="stat-card__hint">Tài khoản đã đăng ký</div>
             </div>
+            <div class="stat-card__bg-icon"><i class="fa-solid fa-users"></i></div>
+        </div>
+    </div>
 
-            <!-- TAB 3: CATEGORIES -->
-            <div class="tab-pane fade show <?php echo $activeTab === 'categories' ? 'active' : ''; ?>">
-                <div class="row">
-                    <!-- Danh sách danh mục -->
-                    <div class="col-lg-7 mb-4">
-                        <div class="premium-card p-4">
-                            <h3 class="font-weight-bold mb-4" style="color: var(--text-main); font-size: 20px;"><i class="fa-solid fa-tags mr-2 text-primary"></i>Danh Sách Danh Mục</h3>
-                            
-                            <?php if (!empty($categories)): ?>
-                                <div class="table-responsive">
-                                    <table class="table table-hover align-middle">
-                                        <thead>
-                                            <tr>
-                                                <th>Mã</th>
-                                                <th>Tên danh mục</th>
-                                                <th>Mô tả</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <?php foreach ($categories as $category): ?>
-                                                <tr>
-                                                    <td class="font-weight-bold">#<?php echo $category->id; ?></td>
-                                                    <td class="font-weight-bold text-main"><?php echo htmlspecialchars($category->name); ?></td>
-                                                    <td class="text-muted small"><?php echo htmlspecialchars($category->description); ?></td>
-                                                </tr>
-                                            <?php endforeach; ?>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            <?php else: ?>
-                                <div class="text-center py-5 text-muted">
-                                    <i class="fa-solid fa-folder-open fa-3x mb-3"></i>
-                                    <h5>Chưa có danh mục nào</h5>
-                                </div>
-                            <?php endif; ?>
-                        </div>
-                    </div>
-                    
-                    <!-- Thêm danh mục mới -->
-                    <div class="col-lg-5 mb-4">
-                        <div class="premium-card p-4">
-                            <h3 class="font-weight-bold mb-4" style="color: var(--text-main); font-size: 20px;"><i class="fa-solid fa-circle-plus mr-2 text-success"></i>Thêm Danh Mục Mới</h3>
-                            
-                            <form action="<?php echo BASE_URL; ?>/Account/addCategory" method="POST">
-                                <div class="form-group mb-3">
-                                    <label for="cat_name" class="small font-weight-bold text-muted mb-2">TÊN DANH MỤC</label>
-                                    <input type="text" class="form-control" id="cat_name" name="name" placeholder="Ví dụ: iPhone, Samsung, Phụ kiện..." required style="border-radius: var(--radius-md); border-color: var(--border-color); background: transparent; color: var(--text-main); font-weight: 500; height: 44px;">
-                                </div>
-                                <div class="form-group mb-4">
-                                    <label for="cat_desc" class="small font-weight-bold text-muted mb-2">MÔ TẢ DANH MỤC</label>
-                                    <textarea class="form-control" id="cat_desc" name="description" rows="3" placeholder="Nhập mô tả ngắn cho danh mục sản phẩm này" style="border-radius: var(--radius-md); border-color: var(--border-color); background: transparent; color: var(--text-main); font-weight: 500;"></textarea>
-                                </div>
-                                <button type="submit" class="btn btn-premium btn-block py-3" style="border-radius: var(--radius-md); font-weight: 700;">
-                                    TẠO DANH MỤC <i class="fa-solid fa-check ml-1"></i>
-                                </button>
+    <!-- Products -->
+    <div class="col-lg-3 col-sm-6 mb-3">
+        <div class="stat-card stat-card--cyan">
+            <div class="stat-card__icon"><i class="fa-solid fa-mobile-screen"></i></div>
+            <div class="stat-card__body">
+                <div class="stat-card__label">Sản phẩm</div>
+                <div class="stat-card__value"><?php echo count($products); ?></div>
+                <div class="stat-card__hint">Đang bày bán</div>
+            </div>
+            <div class="stat-card__bg-icon"><i class="fa-solid fa-mobile-screen"></i></div>
+        </div>
+    </div>
+
+</div>
+
+<!-- ── TAB NAV ────────────────────────────────────────────── -->
+<div class="adm-tab-nav mb-4">
+    <a href="?tab=orders"     class="adm-tab <?php echo $activeTab==='orders'     ? 'adm-tab--active' : ''; ?>">
+        <i class="fa-solid fa-receipt mr-2"></i>Đơn hàng
+        <?php if(!empty($orders)): ?>
+            <span class="adm-tab__badge"><?php echo count($orders); ?></span>
+        <?php endif; ?>
+    </a>
+    <a href="?tab=products"   class="adm-tab <?php echo $activeTab==='products'   ? 'adm-tab--active' : ''; ?>">
+        <i class="fa-solid fa-boxes-stacked mr-2"></i>Sản phẩm
+    </a>
+    <a href="?tab=categories" class="adm-tab <?php echo $activeTab==='categories' ? 'adm-tab--active' : ''; ?>">
+        <i class="fa-solid fa-tags mr-2"></i>Danh mục
+    </a>
+    <a href="?tab=users"      class="adm-tab <?php echo $activeTab==='users'      ? 'adm-tab--active' : ''; ?>">
+        <i class="fa-solid fa-users-gear mr-2"></i>Tài khoản
+        <?php if(!empty($users)): ?>
+            <span class="adm-tab__badge adm-tab__badge--gray"><?php echo count($users); ?></span>
+        <?php endif; ?>
+    </a>
+</div>
+
+<!-- ── TAB CONTENT ───────────────────────────────────────── -->
+
+<!-- ===== TAB 1: ORDERS ===== -->
+<?php if($activeTab === 'orders'): ?>
+<div class="adm-card">
+    <div class="adm-card__head">
+        <div class="adm-card__head-title">
+            <i class="fa-solid fa-receipt text-primary mr-2"></i>Quản lý Đơn hàng
+        </div>
+    </div>
+
+    <?php if(!empty($orders)): ?>
+    <div class="table-responsive">
+        <table class="adm-table">
+            <thead>
+                <tr>
+                    <th>Mã ĐH</th>
+                    <th>Khách hàng</th>
+                    <th>Liên hệ</th>
+                    <th>Tổng tiền</th>
+                    <th>Ngày đặt</th>
+                    <th>Trạng thái</th>
+                    <th class="text-right">Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+            <?php foreach($orders as $order): ?>
+                <tr>
+                    <td><span class="adm-id">#<?php echo $order->id; ?></span></td>
+                    <td>
+                        <div class="font-weight-bold"><?php echo htmlspecialchars($order->name); ?></div>
+                        <?php if(!empty($order->account_name)): ?>
+                            <span class="adm-sub"><i class="fa-regular fa-user mr-1"></i><?php echo htmlspecialchars($order->account_name); ?></span>
+                        <?php endif; ?>
+                    </td>
+                    <td>
+                        <div class="adm-sub"><i class="fa-solid fa-phone mr-1"></i><?php echo htmlspecialchars($order->phone); ?></div>
+                        <div class="adm-sub text-truncate" style="max-width:200px"><i class="fa-solid fa-location-dot mr-1"></i><?php echo htmlspecialchars($order->address); ?></div>
+                    </td>
+                    <td class="font-weight-bold text-danger"><?php echo number_format($order->total_amount ?? 0, 0, ',', '.'); ?> ₫</td>
+                    <td class="adm-sub"><?php echo date('d/m/Y H:i', strtotime($order->created_at)); ?></td>
+                    <td>
+                        <?php
+                        $sc = 'status-processing';
+                        if($order->status === 'Đang giao hàng') $sc = 'status-shipping';
+                        elseif($order->status === 'Đã giao')     $sc = 'status-done';
+                        elseif($order->status === 'Đã hủy')      $sc = 'status-cancel';
+                        ?>
+                        <span class="adm-status <?php echo $sc; ?>"><?php echo htmlspecialchars($order->status); ?></span>
+                    </td>
+                    <td class="text-right">
+                        <div class="d-flex justify-content-end align-items-center" style="gap:8px">
+                            <button class="adm-btn-icon" data-toggle="collapse" data-target="#od-<?php echo $order->id; ?>" title="Chi tiết">
+                                <i class="fa-regular fa-eye"></i>
+                            </button>
+                            <form action="<?php echo BASE_URL; ?>/Account/updateOrderStatus" method="POST" class="d-flex" style="gap:4px">
+                                <input type="hidden" name="order_id" value="<?php echo $order->id; ?>">
+                                <select name="status" class="adm-select">
+                                    <option value="Đang xử lý"   <?php echo $order->status==='Đang xử lý'   ?'selected':''; ?>>Đang xử lý</option>
+                                    <option value="Đang giao hàng" <?php echo $order->status==='Đang giao hàng'?'selected':''; ?>>Đang giao</option>
+                                    <option value="Đã giao"       <?php echo $order->status==='Đã giao'       ?'selected':''; ?>>Đã giao</option>
+                                    <option value="Đã hủy"        <?php echo $order->status==='Đã hủy'        ?'selected':''; ?>>Đã hủy</option>
+                                </select>
+                                <button type="submit" class="adm-btn-save">Lưu</button>
                             </form>
                         </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- TAB 4: USERS -->
-            <div class="tab-pane fade show <?php echo $activeTab === 'users' ? 'active' : ''; ?>">
-                <div class="premium-card p-4">
-                    <h3 class="font-weight-bold mb-4" style="color: var(--text-main); font-size: 20px;"><i class="fa-solid fa-users-gear mr-2 text-primary"></i>Phân Cấp Quyền Hạn</h3>
-                    
-                    <?php if (!empty($users)): ?>
-                        <div class="table-responsive">
-                            <table class="table table-hover align-middle">
-                                <thead>
-                                    <tr>
-                                        <th>Mã</th>
-                                        <th>Tên đăng nhập</th>
-                                        <th>Họ và tên</th>
-                                        <th>Email / Xác thực</th>
-                                        <th>Quyền hạn</th>
-                                        <th>Trạng thái</th>
-                                        <th class="text-right">Thay đổi vai trò</th>
+                    </td>
+                </tr>
+                <!-- Order detail expand row -->
+                <tr class="collapse" id="od-<?php echo $order->id; ?>">
+                    <td colspan="7" class="adm-detail-row">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="adm-detail-title">
+                                    <i class="fa-solid fa-basket-shopping mr-2 text-primary"></i>
+                                    Chi tiết đơn #<?php echo $order->id; ?>
+                                </div>
+                                <table class="adm-inner-table">
+                                    <tr class="adm-inner-table__head">
+                                        <th>Sản phẩm</th><th class="text-center">SL</th>
+                                        <th class="text-right">Đơn giá</th><th class="text-right">Thành tiền</th>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    <?php foreach ($users as $user): ?>
-                                        <tr>
-                                            <td class="font-weight-bold">#<?php echo $user->id; ?></td>
-                                            <td class="font-weight-bold text-main d-flex align-items-center">
-                                                <?php 
-                                                $avatarUrl = !empty($user->avatar) ? (strpos($user->avatar, 'http') === 0 ? $user->avatar : BASE_URL . '/' . $user->avatar) : 'https://api.dicebear.com/7.x/initials/svg?seed=' . urlencode($user->fullname ?? $user->username);
-                                                ?>
-                                                <img src="<?php echo htmlspecialchars($avatarUrl); ?>" class="rounded-circle mr-2 border" style="width: 32px; height: 32px; object-fit: cover;">
-                                                <?php echo htmlspecialchars($user->username); ?>
-                                            </td>
-                                            <td><?php echo htmlspecialchars($user->fullname ?? 'Khách vãng lai'); ?></td>
-                                            <td>
-                                                <div class="small"><?php echo htmlspecialchars($user->email ?? 'Chưa thiết lập'); ?></div>
-                                                <?php if ($user->is_verified): ?>
-                                                    <span class="badge badge-success small py-0 px-1 text-white" style="font-size: 10px; border-radius: 3px;"><i class="fa-solid fa-check"></i> Đã xác thực</span>
-                                                <?php else: ?>
-                                                    <span class="badge badge-warning small py-0 px-1 text-dark" style="font-size: 10px; border-radius: 3px;"><i class="fa-solid fa-clock"></i> Chưa xác thực</span>
-                                                <?php endif; ?>
-                                            </td>
-                                            <td>
-                                                <?php if ($user->role === 'admin'): ?>
-                                                    <span class="badge badge-danger px-3 py-2 font-weight-bold" style="font-size: 11px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px;">
-                                                        <i class="fa-solid fa-shield-halved mr-1"></i> Administrator
-                                                    </span>
-                                                <?php else: ?>
-                                                    <span class="badge badge-secondary px-3 py-2 font-weight-bold" style="font-size: 11px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px;">
-                                                        <i class="fa-solid fa-user mr-1"></i> Customer
-                                                    </span>
-                                                <?php endif; ?>
-                                            </td>
-                                            <td>
-                                                <?php if ($user->is_locked): ?>
-                                                    <span class="badge badge-danger px-2 py-1 font-weight-bold" style="font-size: 11px; border-radius: 4px;"><i class="fa-solid fa-lock mr-1"></i> Bị khóa</span>
-                                                <?php else: ?>
-                                                    <span class="badge badge-success px-2 py-1 font-weight-bold" style="font-size: 11px; border-radius: 4px;"><i class="fa-solid fa-circle-check mr-1"></i> Hoạt động</span>
-                                                <?php endif; ?>
-                                            </td>
-                                            <td class="text-right">
-                                                <div class="d-flex justify-content-end align-items-center" style="gap: 8px;">
-                                                    <form action="<?php echo BASE_URL; ?>/Account/updateUserRole" method="POST" class="d-flex align-items-center mb-0" style="gap: 4px;">
-                                                        <input type="hidden" name="user_id" value="<?php echo $user->id; ?>">
-                                                        <select name="role" class="form-control form-control-sm" style="width: 100px; height: 32px; border-radius: 4px; font-weight: 600; font-size: 12px;" <?php echo $_SESSION['username'] == $user->username ? 'disabled' : ''; ?>>
-                                                            <option value="user" <?php echo $user->role === 'user' ? 'selected' : ''; ?>>Customer</option>
-                                                            <option value="admin" <?php echo $user->role === 'admin' ? 'selected' : ''; ?>>Admin</option>
-                                                        </select>
-                                                        <button type="submit" class="btn btn-sm btn-premium py-1 px-2" style="border-radius: 4px; font-size: 11px; height: 32px;" <?php echo $_SESSION['username'] == $user->username ? 'disabled' : ''; ?>>Sửa</button>
-                                                    </form>
-                                                    
-                                                    <?php if ($_SESSION['username'] != $user->username): ?>
-                                                        <!-- Nút Khóa / Mở khóa tài khoản -->
-                                                        <?php if ($user->is_locked): ?>
-                                                            <a href="<?php echo BASE_URL; ?>/Account/toggleUserLock/<?php echo $user->id; ?>" class="btn btn-sm btn-success d-flex align-items-center justify-content-center text-white" style="width: 32px; height: 32px; padding: 0; border-radius: 4px; border: 1px solid var(--success); background-color: var(--success);" title="Mở khóa tài khoản" onclick="return confirm('Bạn muốn mở khóa tài khoản này?');">
-                                                                <i class="fa-solid fa-lock-open" style="font-size: 12px;"></i>
-                                                            </a>
-                                                        <?php else: ?>
-                                                            <a href="<?php echo BASE_URL; ?>/Account/toggleUserLock/<?php echo $user->id; ?>" class="btn btn-sm btn-warning d-flex align-items-center justify-content-center text-white" style="width: 32px; height: 32px; padding: 0; border-radius: 4px;" title="Khóa tài khoản" onclick="return confirm('Bạn chắc chắn muốn khóa tài khoản này? Người dùng sẽ không thể đăng nhập!');">
-                                                                <i class="fa-solid fa-lock" style="font-size: 12px;"></i>
-                                                            </a>
-                                                        <?php endif; ?>
-
-                                                        <a href="<?php echo BASE_URL; ?>/Account/deleteUser/<?php echo $user->id; ?>" class="btn btn-sm btn-outline-danger d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; padding: 0; border-radius: 4px;" title="Xóa tài khoản" onclick="return confirm('Bạn có chắc chắn muốn xóa tài khoản này? Thao tác này không thể hoàn tác!');">
-                                                            <i class="fa-solid fa-trash-can" style="font-size: 12px;"></i>
-                                                        </a>
-                                                    <?php else: ?>
-                                                        <button class="btn btn-sm btn-outline-secondary d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; padding: 0; border-radius: 4px;" disabled title="Không thể khóa/xóa tài khoản của chính bạn">
-                                                            <i class="fa-solid fa-lock" style="font-size: 12px;"></i>
-                                                        </button>
-                                                        <button class="btn btn-sm btn-outline-secondary d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; padding: 0; border-radius: 4px;" disabled title="Không thể xóa tài khoản của chính bạn">
-                                                            <i class="fa-solid fa-trash-can" style="font-size: 12px;"></i>
-                                                        </button>
-                                                    <?php endif; ?>
-                                                </div>
-                                            </td>
-                                        </tr>
+                                    <?php foreach($orderDetails[$order->id] as $item): ?>
+                                    <tr>
+                                        <td class="d-flex align-items-center py-2" style="gap:10px">
+                                            <?php if(!empty($item->product_image)): ?>
+                                                <img src="<?php echo (strpos($item->product_image,'http')===0)?$item->product_image:BASE_URL.'/'.$item->product_image; ?>"
+                                                     style="width:38px;height:38px;object-fit:contain;background:#fff;border:1px solid var(--border-color);border-radius:6px;padding:2px">
+                                            <?php endif; ?>
+                                            <span class="font-weight-bold small"><?php echo htmlspecialchars($item->product_name ?? 'Đã xóa'); ?></span>
+                                        </td>
+                                        <td class="text-center small">x<?php echo $item->quantity; ?></td>
+                                        <td class="text-right small"><?php echo number_format($item->price,0,',','.'); ?> ₫</td>
+                                        <td class="text-right small font-weight-bold text-danger"><?php echo number_format($item->quantity*$item->price,0,',','.'); ?> ₫</td>
+                                    </tr>
                                     <?php endforeach; ?>
-                                </tbody>
-                            </table>
+                                </table>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="adm-address-card">
+                                    <div class="adm-address-card__title">Địa chỉ nhận hàng</div>
+                                    <div class="adm-address-card__row"><i class="fa-solid fa-user mr-1"></i><?php echo htmlspecialchars($order->name); ?></div>
+                                    <div class="adm-address-card__row"><i class="fa-solid fa-phone mr-1"></i><?php echo htmlspecialchars($order->phone); ?></div>
+                                    <div class="adm-address-card__row"><i class="fa-solid fa-location-dot mr-1"></i><?php echo htmlspecialchars($order->address); ?></div>
+                                </div>
+                            </div>
                         </div>
-                    <?php endif; ?>
-                </div>
-            </div>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+    <?php else: ?>
+        <div class="adm-empty">
+            <i class="fa-solid fa-receipt fa-3x mb-3"></i>
+            <h5>Chưa có đơn hàng nào</h5>
+            <p class="small">Đơn hàng từ khách hàng sẽ xuất hiện tại đây.</p>
+        </div>
+    <?php endif; ?>
+</div>
+<?php endif; ?>
 
+<!-- ===== TAB 2: PRODUCTS ===== -->
+<?php if($activeTab === 'products'): ?>
+<div class="adm-card">
+    <div class="adm-card__head">
+        <div class="adm-card__head-title">
+            <i class="fa-solid fa-boxes-stacked text-primary mr-2"></i>Quản lý Sản phẩm
+        </div>
+        <a href="<?php echo BASE_URL; ?>/Product/add" class="adm-btn-primary">
+            <i class="fa-solid fa-plus mr-1"></i>Thêm sản phẩm
+        </a>
+    </div>
+    <?php if(!empty($products)): ?>
+    <div class="table-responsive">
+        <table class="adm-table">
+            <thead>
+                <tr><th>Ảnh</th><th>Tên sản phẩm</th><th>Danh mục</th><th>Giá bán</th><th>Mô tả</th><th class="text-right">Thao tác</th></tr>
+            </thead>
+            <tbody>
+            <?php foreach($products as $product): ?>
+                <tr>
+                    <td>
+                        <?php $pImg = !empty($product->image)?((strpos($product->image,'http')===0)?$product->image:BASE_URL.'/'.$product->image):'https://via.placeholder.com/50'; ?>
+                        <img src="<?php echo $pImg; ?>" style="width:50px;height:50px;object-fit:contain;border-radius:8px;border:1px solid var(--border-color);background:#fff;padding:3px">
+                    </td>
+                    <td class="font-weight-bold"><?php echo htmlspecialchars($product->name); ?></td>
+                    <td><span class="adm-cat-badge"><?php echo htmlspecialchars($product->category_name ?? 'Khác'); ?></span></td>
+                    <td class="font-weight-bold text-danger"><?php echo number_format($product->price,0,',','.'); ?> ₫</td>
+                    <td class="adm-sub text-truncate" style="max-width:220px"><?php echo htmlspecialchars($product->description); ?></td>
+                    <td class="text-right">
+                        <div class="d-flex justify-content-end" style="gap:6px">
+                            <a href="<?php echo BASE_URL; ?>/Product/edit/<?php echo $product->id; ?>" class="adm-action-btn adm-action-btn--edit" title="Sửa"><i class="fa-solid fa-pen"></i></a>
+                            <a href="<?php echo BASE_URL; ?>/Product/delete/<?php echo $product->id; ?>" class="adm-action-btn adm-action-btn--del" title="Xóa" onclick="return confirm('Xóa sản phẩm này?')"><i class="fa-solid fa-trash"></i></a>
+                        </div>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+    <?php else: ?>
+        <div class="adm-empty">
+            <i class="fa-solid fa-box-open fa-3x mb-3"></i>
+            <h5>Cửa hàng trống</h5>
+            <a href="<?php echo BASE_URL; ?>/Product/add" class="adm-btn-primary mt-3">Thêm sản phẩm ngay</a>
+        </div>
+    <?php endif; ?>
+</div>
+<?php endif; ?>
+
+<!-- ===== TAB 3: CATEGORIES ===== -->
+<?php if($activeTab === 'categories'): ?>
+<div class="row">
+    <div class="col-lg-7 mb-4">
+        <div class="adm-card">
+            <div class="adm-card__head">
+                <div class="adm-card__head-title"><i class="fa-solid fa-tags text-primary mr-2"></i>Danh mục hiện có</div>
+            </div>
+            <?php if(!empty($categories)): ?>
+            <div class="table-responsive">
+                <table class="adm-table">
+                    <thead><tr><th>Mã</th><th>Tên danh mục</th><th>Mô tả</th></tr></thead>
+                    <tbody>
+                    <?php foreach($categories as $cat): ?>
+                        <tr>
+                            <td><span class="adm-id">#<?php echo $cat->id; ?></span></td>
+                            <td class="font-weight-bold"><?php echo htmlspecialchars($cat->name); ?></td>
+                            <td class="adm-sub"><?php echo htmlspecialchars($cat->description ?? '—'); ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+            <?php else: ?>
+                <div class="adm-empty"><i class="fa-solid fa-folder-open fa-3x mb-3"></i><h5>Chưa có danh mục</h5></div>
+            <?php endif; ?>
+        </div>
+    </div>
+
+    <div class="col-lg-5 mb-4">
+        <div class="adm-card">
+            <div class="adm-card__head">
+                <div class="adm-card__head-title"><i class="fa-solid fa-circle-plus text-success mr-2"></i>Thêm danh mục mới</div>
+            </div>
+            <div class="p-4">
+                <form action="<?php echo BASE_URL; ?>/Account/addCategory" method="POST">
+                    <div class="form-group mb-3">
+                        <label class="adm-label">TÊN DANH MỤC</label>
+                        <input type="text" name="name" class="adm-input" placeholder="Ví dụ: iPhone, Samsung..." required>
+                    </div>
+                    <div class="form-group mb-4">
+                        <label class="adm-label">MÔ TẢ</label>
+                        <textarea name="description" class="adm-input" rows="3" placeholder="Mô tả ngắn..."></textarea>
+                    </div>
+                    <button type="submit" class="adm-btn-primary w-100 py-3" style="font-size:15px;font-weight:800;border-radius:var(--radius-md);">
+                        TẠO DANH MỤC <i class="fa-solid fa-check ml-2"></i>
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
 </div>
+<?php endif; ?>
 
+<!-- ===== TAB 4: USERS ===== -->
+<?php if($activeTab === 'users'): ?>
+<div class="adm-card">
+    <div class="adm-card__head">
+        <div class="adm-card__head-title"><i class="fa-solid fa-users-gear text-primary mr-2"></i>Quản lý Tài khoản</div>
+    </div>
+    <?php if(!empty($users)): ?>
+    <div class="table-responsive">
+        <table class="adm-table">
+            <thead>
+                <tr><th>Mã</th><th>Tài khoản</th><th>Họ tên</th><th>Email / Xác thực</th><th>Quyền</th><th>Trạng thái</th><th class="text-right">Quản lý</th></tr>
+            </thead>
+            <tbody>
+            <?php foreach($users as $u): ?>
+                <?php $av = !empty($u->avatar)?(strpos($u->avatar,'http')===0?$u->avatar:BASE_URL.'/'.$u->avatar):'https://api.dicebear.com/7.x/initials/svg?seed='.urlencode($u->fullname??$u->username); ?>
+                <tr>
+                    <td><span class="adm-id">#<?php echo $u->id; ?></span></td>
+                    <td>
+                        <div class="d-flex align-items-center" style="gap:10px">
+                            <img src="<?php echo htmlspecialchars($av); ?>" class="rounded-circle" style="width:34px;height:34px;object-fit:cover;border:2px solid var(--border-color)">
+                            <span class="font-weight-bold"><?php echo htmlspecialchars($u->username); ?></span>
+                        </div>
+                    </td>
+                    <td><?php echo htmlspecialchars($u->fullname ?? '—'); ?></td>
+                    <td>
+                        <div class="small"><?php echo htmlspecialchars($u->email ?? 'Chưa thiết lập'); ?></div>
+                        <?php if($u->is_verified): ?>
+                            <span class="adm-verify adm-verify--ok"><i class="fa-solid fa-check mr-1"></i>Đã xác thực</span>
+                        <?php else: ?>
+                            <span class="adm-verify adm-verify--pending"><i class="fa-solid fa-clock mr-1"></i>Chưa xác thực</span>
+                        <?php endif; ?>
+                    </td>
+                    <td>
+                        <?php if($u->role==='admin'): ?>
+                            <span class="adm-role adm-role--admin"><i class="fa-solid fa-shield-halved mr-1"></i>Admin</span>
+                        <?php else: ?>
+                            <span class="adm-role adm-role--user"><i class="fa-solid fa-user mr-1"></i>User</span>
+                        <?php endif; ?>
+                    </td>
+                    <td>
+                        <?php if($u->is_locked): ?>
+                            <span class="adm-lock adm-lock--locked"><i class="fa-solid fa-lock mr-1"></i>Bị khóa</span>
+                        <?php else: ?>
+                            <span class="adm-lock adm-lock--active"><i class="fa-solid fa-circle-check mr-1"></i>Hoạt động</span>
+                        <?php endif; ?>
+                    </td>
+                    <td class="text-right">
+                        <div class="d-flex justify-content-end align-items-center" style="gap:6px">
+                            <!-- Role selector -->
+                            <form action="<?php echo BASE_URL; ?>/Account/updateUserRole" method="POST" class="d-flex mb-0" style="gap:4px">
+                                <input type="hidden" name="user_id" value="<?php echo $u->id; ?>">
+                                <select name="role" class="adm-select" <?php echo $_SESSION['username']==$u->username?'disabled':''; ?>>
+                                    <option value="user"  <?php echo $u->role==='user' ?'selected':''; ?>>User</option>
+                                    <option value="admin" <?php echo $u->role==='admin'?'selected':''; ?>>Admin</option>
+                                </select>
+                                <button type="submit" class="adm-btn-save" <?php echo $_SESSION['username']==$u->username?'disabled':''; ?>>Đổi</button>
+                            </form>
+
+                            <?php if($_SESSION['username'] != $u->username): ?>
+                                <!-- Lock/Unlock -->
+                                <?php if($u->is_locked): ?>
+                                    <a href="<?php echo BASE_URL; ?>/Account/toggleUserLock/<?php echo $u->id; ?>"
+                                       class="adm-action-btn adm-action-btn--unlock" title="Mở khóa"
+                                       onclick="return confirm('Mở khóa tài khoản này?')">
+                                        <i class="fa-solid fa-lock-open"></i>
+                                    </a>
+                                <?php else: ?>
+                                    <a href="<?php echo BASE_URL; ?>/Account/toggleUserLock/<?php echo $u->id; ?>"
+                                       class="adm-action-btn adm-action-btn--lock" title="Khóa tài khoản"
+                                       onclick="return confirm('Khóa tài khoản này? Người dùng sẽ không thể đăng nhập!')">
+                                        <i class="fa-solid fa-lock"></i>
+                                    </a>
+                                <?php endif; ?>
+                                <!-- Delete -->
+                                <a href="<?php echo BASE_URL; ?>/Account/deleteUser/<?php echo $u->id; ?>"
+                                   class="adm-action-btn adm-action-btn--del" title="Xóa tài khoản"
+                                   onclick="return confirm('Xóa tài khoản này vĩnh viễn?')">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </a>
+                            <?php else: ?>
+                                <button class="adm-action-btn" disabled title="Không thể tự thao tác" style="opacity:.35">
+                                    <i class="fa-solid fa-ban"></i>
+                                </button>
+                            <?php endif; ?>
+                        </div>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+    <?php else: ?>
+        <div class="adm-empty"><i class="fa-solid fa-users fa-3x mb-3"></i><h5>Không có tài khoản nào</h5></div>
+    <?php endif; ?>
+</div>
+<?php endif; ?>
+
+<!-- ===================== ALL ADMIN STYLES ===================== -->
 <style>
-    /* Styling adjustments for the tables */
-    .table th {
-        background-color: var(--light);
-        color: var(--text-muted);
-        text-transform: uppercase;
-        font-size: 11px;
-        letter-spacing: 0.5px;
-        border-bottom: 2px solid var(--border-color);
-        font-weight: 700;
-        padding: 16px 12px;
-    }
-    
-    .table td {
-        color: var(--text-main);
-        padding: 16px 12px;
-        vertical-align: middle !important;
-        border-bottom: 1px solid var(--border-color);
-    }
-    
-    /* Styling active state for tab pills */
-    .nav-pills .nav-link {
-        color: var(--text-muted);
-        background-color: transparent;
-    }
-    
-    .nav-pills .nav-link:hover {
-        color: var(--primary);
-        background-color: var(--primary-light);
-    }
-    
-    body.dark-theme .nav-pills .nav-link:hover {
-        background-color: rgba(79, 70, 229, 0.15);
-    }
-    
-    .nav-pills .nav-link.active {
-        color: white !important;
-        background: linear-gradient(135deg, var(--primary), var(--secondary)) !important;
-        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25) !important;
-    }
-    
-    .text-main {
-        color: var(--text-main) !important;
-    }
+/* ── Page Header ─────────────────────────────────────── */
+.adm-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+.adm-header__left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+.adm-header__icon {
+    width: 52px; height: 52px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 22px;
+    box-shadow: 0 8px 20px rgba(79,70,229,.3);
+    flex-shrink: 0;
+}
+.adm-header__title {
+    font-size: 1.75rem; font-weight: 800;
+    letter-spacing: -.5px;
+    color: var(--text-main); margin: 0;
+}
+.adm-header__sub {
+    font-size: 13px; color: var(--text-muted); margin: 0;
+}
+.adm-back-btn {
+    display: inline-flex; align-items: center;
+    padding: 10px 20px;
+    border-radius: var(--radius-md);
+    font-weight: 700; font-size: 14px;
+    color: var(--primary) !important;
+    border: 2px solid var(--primary);
+    text-decoration: none;
+    transition: all .25s;
+}
+.adm-back-btn:hover {
+    background: var(--primary);
+    color: #fff !important;
+    text-decoration: none;
+    transform: translateY(-2px);
+}
+
+/* ── Stat Cards ─────────────────────────────────────── */
+.stat-card {
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(0,0,0,.08);
+    transition: transform .3s, box-shadow .3s;
+}
+.stat-card:hover { transform: translateY(-4px); box-shadow: 0 16px 40px rgba(0,0,0,.12); }
+
+.stat-card--indigo { background: linear-gradient(135deg, #4f46e5, #6366f1); }
+.stat-card--emerald { background: linear-gradient(135deg, #059669, #10b981); }
+.stat-card--amber  { background: linear-gradient(135deg, #d97706, #f59e0b); }
+.stat-card--cyan   { background: linear-gradient(135deg, #0891b2, #06b6d4); }
+
+.stat-card__icon {
+    width: 52px; height: 52px; flex-shrink: 0;
+    border-radius: 14px;
+    background: rgba(255,255,255,.2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; color: #fff;
+}
+.stat-card__label {
+    font-size: 11px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .8px;
+    color: rgba(255,255,255,.75); margin-bottom: 4px;
+}
+.stat-card__value {
+    font-size: 1.6rem; font-weight: 800;
+    color: #fff; line-height: 1.1;
+    letter-spacing: -.5px;
+}
+.stat-card__hint {
+    font-size: 11px; color: rgba(255,255,255,.6); margin-top: 4px;
+}
+.stat-card__bg-icon {
+    position: absolute;
+    right: -10px; bottom: -12px;
+    font-size: 80px;
+    color: rgba(255,255,255,.07);
+    pointer-events: none;
+}
+
+/* ── Tab Nav ──────────────────────────────────────── */
+.adm-tab-nav {
+    display: flex;
+    gap: 6px;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 8px;
+    flex-wrap: wrap;
+    box-shadow: var(--shadow-sm);
+}
+.adm-tab {
+    display: inline-flex; align-items: center;
+    padding: 10px 20px;
+    border-radius: var(--radius-sm);
+    font-size: 14px; font-weight: 700;
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: all .2s;
+    white-space: nowrap;
+    gap: 6px;
+}
+.adm-tab:hover {
+    background: var(--primary-light);
+    color: var(--primary);
+    text-decoration: none;
+}
+.adm-tab--active {
+    background: linear-gradient(135deg, var(--primary), var(--secondary)) !important;
+    color: #fff !important;
+    box-shadow: 0 4px 14px rgba(79,70,229,.3);
+}
+.adm-tab__badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 20px; height: 20px;
+    border-radius: 10px; padding: 0 6px;
+    font-size: 11px; font-weight: 800;
+    background: rgba(255,255,255,.25);
+    color: #fff;
+}
+.adm-tab__badge--gray {
+    background: rgba(100,116,139,.15);
+    color: var(--text-muted);
+}
+.adm-tab--active .adm-tab__badge--gray {
+    background: rgba(255,255,255,.25);
+    color: #fff;
+}
+
+/* ── Card ─────────────────────────────────────────── */
+.adm-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    margin-bottom: 24px;
+}
+.adm-card__head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border-color);
+    flex-wrap: wrap; gap: 12px;
+}
+.adm-card__head-title {
+    font-size: 17px; font-weight: 800;
+    color: var(--text-main);
+    display: flex; align-items: center;
+}
+
+/* ── Table ────────────────────────────────────────── */
+.adm-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.adm-table th {
+    background: var(--light);
+    color: var(--text-muted);
+    font-size: 11px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .5px;
+    padding: 14px 16px;
+    border-bottom: 2px solid var(--border-color);
+    white-space: nowrap;
+}
+.adm-table td {
+    padding: 14px 16px;
+    color: var(--text-main);
+    border-bottom: 1px solid var(--border-color);
+    vertical-align: middle;
+    font-size: 14px;
+}
+.adm-table tbody tr:last-child td { border-bottom: none; }
+.adm-table tbody tr:hover td { background: rgba(79,70,229,.025); }
+
+/* ── Misc elements ────────────────────────────────── */
+.adm-id {
+    font-weight: 800; font-size: 13px;
+    color: var(--primary);
+}
+.adm-sub {
+    font-size: 12px; color: var(--text-muted); line-height: 1.4;
+}
+.adm-empty {
+    text-align: center; padding: 60px 20px;
+    color: var(--text-muted);
+}
+
+/* Status badges */
+.adm-status {
+    display: inline-block;
+    padding: 4px 10px; border-radius: 6px;
+    font-size: 12px; font-weight: 700;
+    white-space: nowrap;
+}
+.status-processing { background: rgba(245,158,11,.12); color: #d97706; }
+.status-shipping   { background: rgba(6,182,212,.12);  color: #0891b2; }
+.status-done       { background: rgba(16,185,129,.12); color: #059669; }
+.status-cancel     { background: rgba(239,68,68,.12);  color: #dc2626; }
+
+/* Role & verify badges */
+.adm-role, .adm-verify, .adm-lock {
+    display: inline-flex; align-items: center;
+    padding: 4px 10px; border-radius: 6px;
+    font-size: 11px; font-weight: 700;
+    white-space: nowrap;
+}
+.adm-role--admin   { background: rgba(239,68,68,.12);  color: #dc2626; }
+.adm-role--user    { background: rgba(100,116,139,.1); color: var(--text-muted); }
+.adm-verify--ok    { background: rgba(16,185,129,.12); color: #059669; }
+.adm-verify--pending { background: rgba(245,158,11,.12); color: #d97706; }
+.adm-lock--active  { background: rgba(16,185,129,.12); color: #059669; }
+.adm-lock--locked  { background: rgba(239,68,68,.12);  color: #dc2626; }
+
+/* Category badge */
+.adm-cat-badge {
+    display: inline-block;
+    padding: 3px 10px; border-radius: 6px;
+    font-size: 11px; font-weight: 700;
+    background: linear-gradient(135deg, rgba(79,70,229,.12), rgba(6,182,212,.08));
+    color: var(--primary);
+    border: 1px solid rgba(79,70,229,.15);
+}
+
+/* Action buttons */
+.adm-action-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 32px; height: 32px;
+    border-radius: 8px; font-size: 13px;
+    text-decoration: none; border: none;
+    cursor: pointer; transition: all .2s;
+    background: var(--light); color: var(--text-muted);
+    border: 1px solid var(--border-color);
+}
+.adm-action-btn:hover { transform: scale(1.1); text-decoration: none; }
+.adm-action-btn--edit   { background: rgba(245,158,11,.1); color: #d97706; border-color: rgba(245,158,11,.2); }
+.adm-action-btn--del    { background: rgba(239,68,68,.1);  color: #dc2626; border-color: rgba(239,68,68,.2);  }
+.adm-action-btn--unlock { background: rgba(16,185,129,.1); color: #059669; border-color: rgba(16,185,129,.2); }
+.adm-action-btn--lock   { background: rgba(245,158,11,.1); color: #d97706; border-color: rgba(245,158,11,.2); }
+.adm-btn-icon {
+    display: inline-flex; align-items: center; justify-content: center;
+    height: 32px; padding: 0 12px;
+    border-radius: 8px; font-size: 13px;
+    border: 1px solid var(--border-color);
+    background: var(--light); color: var(--text-muted);
+    cursor: pointer; transition: all .2s;
+}
+.adm-btn-icon:hover { background: var(--primary-light); color: var(--primary); border-color: var(--primary); }
+
+/* Select & Save */
+.adm-select {
+    height: 32px; padding: 0 8px;
+    border-radius: 8px; font-size: 12px; font-weight: 600;
+    border: 1px solid var(--border-color);
+    background: var(--card-bg); color: var(--text-main);
+    outline: none;
+}
+.adm-btn-save {
+    height: 32px; padding: 0 12px;
+    border-radius: 8px; font-size: 12px; font-weight: 800;
+    border: none; cursor: pointer;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: #fff;
+    transition: all .2s;
+}
+.adm-btn-save:hover { opacity: .88; transform: scale(1.04); }
+.adm-btn-save:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+
+/* Primary button */
+.adm-btn-primary {
+    display: inline-flex; align-items: center;
+    padding: 10px 20px; border-radius: var(--radius-md);
+    font-size: 14px; font-weight: 700;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: #fff !important; text-decoration: none;
+    border: none; cursor: pointer;
+    box-shadow: 0 4px 12px rgba(79,70,229,.25);
+    transition: all .25s;
+}
+.adm-btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(79,70,229,.35); text-decoration: none; }
+
+/* Detail expand row */
+.adm-detail-row {
+    background: var(--light) !important;
+    padding: 24px 20px !important;
+    border-left: 4px solid var(--primary);
+}
+.adm-detail-title {
+    font-weight: 800; font-size: 15px;
+    color: var(--text-main); margin-bottom: 16px;
+}
+.adm-inner-table { width: 100%; border-collapse: collapse; }
+.adm-inner-table__head th {
+    font-size: 11px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .5px;
+    color: var(--text-muted); padding: 8px 12px;
+    border-bottom: 1px solid var(--border-color);
+}
+.adm-inner-table td {
+    padding: 8px 12px; font-size: 13px;
+    border-bottom: 1px dashed var(--border-color);
+    vertical-align: middle; color: var(--text-main);
+}
+
+/* Address card */
+.adm-address-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 16px;
+}
+.adm-address-card__title {
+    font-weight: 800; font-size: 12px;
+    text-transform: uppercase; letter-spacing: .5px;
+    color: var(--text-muted); margin-bottom: 12px;
+}
+.adm-address-card__row {
+    font-size: 13px; color: var(--text-muted);
+    margin-bottom: 6px; line-height: 1.5;
+}
+
+/* Category form inputs */
+.adm-label {
+    display: block; font-size: 11px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .5px;
+    color: var(--text-muted); margin-bottom: 8px;
+}
+.adm-input {
+    width: 100%; padding: 12px 14px;
+    border-radius: var(--radius-md);
+    border: 1.5px solid var(--border-color);
+    background: transparent; color: var(--text-main);
+    font-size: 14px; font-weight: 500;
+    transition: border-color .2s, box-shadow .2s;
+    outline: none;
+    display: block;
+}
+.adm-input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(79,70,229,.12);
+}
+.w-100 { width: 100%; }
 </style>
 
 <?php include 'app/views/shares/footer.php'; ?>
