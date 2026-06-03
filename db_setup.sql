@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS product (
     description TEXT NOT NULL,
     price DECIMAL(10,2) NOT NULL,
     category_id INT NULL,
-    image VARCHAR(255) NULL,
+    image TEXT NULL,
     FOREIGN KEY (category_id) REFERENCES category(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 

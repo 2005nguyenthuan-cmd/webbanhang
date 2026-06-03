@@ -3,6 +3,7 @@ require_once('app/config/database.php');
 require_once('app/models/AccountModel.php');
 require_once('app/models/ProductModel.php');
 require_once('app/models/CategoryModel.php');
+require_once('app/helpers/MailHelper.php');
 
 class AccountController {
     private $accountModel;
@@ -65,8 +66,23 @@ class AccountController {
                     if (session_status() === PHP_SESSION_NONE) {
                         session_start();
                     }
-                    $verifyLink = BASE_URL . '/Account/verify?token=' . $verificationToken;
-                    $_SESSION['register_success'] = "Đăng ký thành công! Hãy xác thực Email để kích hoạt tài khoản.<br>Đường dẫn kích hoạt mẫu: <a href='" . $verifyLink . "' class='font-weight-bold alert-link'>Xác thực ngay tại đây</a>";
+                    
+                    // Domain part needs to be absolute for emails, assuming http://localhost/project1 or similar based on BASE_URL
+                    $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https://' : 'http://';
+                    $host = $_SERVER['HTTP_HOST'];
+                    $absoluteBaseUrl = $protocol . $host . BASE_URL;
+                    
+                    $verifyLink = $absoluteBaseUrl . '/Account/verify?token=' . $verificationToken;
+                    
+                    // Send Email
+                    $mailSent = MailHelper::sendVerificationEmail($email, $fullName, $verifyLink);
+                    
+                    if ($mailSent) {
+                        $_SESSION['register_success'] = "Đăng ký thành công! Vui lòng kiểm tra hộp thư email (bao gồm cả thư mục Spam) để kích hoạt tài khoản.";
+                    } else {
+                        $_SESSION['register_success'] = "Đăng ký thành công nhưng hệ thống không thể gửi email xác thực lúc này. Vui lòng liên hệ quản trị viên.";
+                    }
+                    
                     header('Location: ' . BASE_URL . '/Account/login');
                     exit;
                 } else {
@@ -191,8 +207,31 @@ class AccountController {
                 session_start();
             }
             if ($success) {
-                $resetLink = BASE_URL . '/Account/resetPassword?token=' . $token;
-                $_SESSION['reset_success'] = "Một yêu cầu đặt lại mật khẩu đã được xử lý!<br>Liên kết khôi phục mẫu: <a href='" . $resetLink . "' class='font-weight-bold alert-link'>Nhấp vào đây để đặt lại mật khẩu</a>";
+                // Domain part needs to be absolute for emails
+                $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https://' : 'http://';
+                $host = $_SERVER['HTTP_HOST'];
+                $absoluteBaseUrl = $protocol . $host . BASE_URL;
+                
+                $resetLink = $absoluteBaseUrl . '/Account/resetPassword?token=' . $token;
+                
+                // Fetch the full user details to get the actual email if they inputted a username
+                // Or just use the email they provided if it is an email
+                $account = $this->accountModel->getAccountByUsername($usernameOrEmail);
+                if (!$account) {
+                    $account = $this->accountModel->getAccountByEmail($usernameOrEmail);
+                }
+                
+                if ($account && !empty($account->email)) {
+                    $mailSent = MailHelper::sendResetPasswordEmail($account->email, $account->fullname, $resetLink);
+                    
+                    if ($mailSent) {
+                        $_SESSION['reset_success'] = "Một liên kết đặt lại mật khẩu đã được gửi đến email của bạn! Vui lòng kiểm tra hộp thư (bao gồm cả mục Spam).";
+                    } else {
+                        $_SESSION['reset_error'] = "Yêu cầu đã được xử lý nhưng không thể gửi email. Vui lòng thử lại sau.";
+                    }
+                } else {
+                    $_SESSION['reset_error'] = "Tài khoản không được liên kết với địa chỉ email hợp lệ nào.";
+                }
             } else {
                 $_SESSION['reset_error'] = "Tên đăng nhập hoặc Email không tồn tại trên hệ thống!";
             }

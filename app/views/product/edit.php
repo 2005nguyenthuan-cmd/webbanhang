@@ -31,7 +31,7 @@
 
                 <form method="POST" action="<?php echo BASE_URL; ?>/Product/update" enctype="multipart/form-data">
                     <input type="hidden" name="id" value="<?php echo $product->id; ?>">
-                    <input type="hidden" name="existing_image" value="<?php echo $product->image; ?>">
+                    <input type="hidden" name="existing_image" value="<?php echo htmlspecialchars($product->image, ENT_QUOTES, 'UTF-8'); ?>">
                     
                     <div class="form-group mb-4">
                         <label for="name" class="font-weight-bold text-secondary small text-uppercase mb-2">Tên điện thoại / sản phẩm:</label>
