@@ -55,7 +55,17 @@
                     </div>
                 </div>
 
-                <button type="submit" class="btn btn-premium btn-block py-3 mt-4" style="border-radius: var(--radius-md); font-weight: 700; font-size: 15px; letter-spacing: 0.5px;">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="remember_me" id="remember_me">
+                        <label class="form-check-label small font-weight-bold text-muted" for="remember_me" style="cursor: pointer;">
+                            Ghi nhớ đăng nhập
+                        </label>
+                    </div>
+                    <a href="<?php echo BASE_URL; ?>/Account/forgotPassword" class="small font-weight-bold" style="color: var(--primary); text-decoration: none;">Quên mật khẩu?</a>
+                </div>
+
+                <button type="submit" class="btn btn-premium btn-block py-3" style="border-radius: var(--radius-md); font-weight: 700; font-size: 15px; letter-spacing: 0.5px;">
                     ĐĂNG NHẬP <i class="fa-solid fa-arrow-right-to-bracket ml-2"></i>
                 </button>
             </form>

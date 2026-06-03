@@ -3,6 +3,28 @@ session_start();
 if (!defined('BASE_URL')) {
     define('BASE_URL', str_replace('/index.php', '', $_SERVER['SCRIPT_NAME']));
 }
+
+require_once 'app/config/database.php';
+require_once 'app/models/AccountModel.php';
+
+// Auto-login from Remember Me cookie
+if (!isset($_SESSION['username']) && isset($_COOKIE['remember_me'])) {
+    $parts = explode(':', $_COOKIE['remember_me'], 2);
+    if (count($parts) === 2) {
+        $username = $parts[0];
+        $token = $parts[1];
+        
+        $db = (new Database())->getConnection();
+        $accountModel = new AccountModel($db);
+        $account = $accountModel->getAccountByUsername($username);
+        if ($account && $account->remember_token === $token && !$account->is_locked && $account->is_verified) {
+            $_SESSION['username'] = $account->username;
+            $_SESSION['role'] = $account->role;
+            $_SESSION['fullname'] = $account->fullname;
+        }
+    }
+}
+
 require_once 'app/models/ProductModel.php';
 require_once 'app/helpers/SessionHelper.php';
 // Product/add

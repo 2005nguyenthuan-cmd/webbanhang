@@ -41,6 +41,16 @@
                 </div>
 
                 <div class="form-group mb-3">
+                    <label for="email" class="small font-weight-bold mb-2" style="color: var(--text-main);">EMAIL XÁC THỰC</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text bg-transparent" style="border-right: none; border-top-left-radius: var(--radius-md); border-bottom-left-radius: var(--radius-md); border-color: var(--border-color); color: var(--text-muted);"><i class="fa-regular fa-envelope"></i></span>
+                        </div>
+                        <input type="email" class="form-control" id="email" name="email" placeholder="Nhập địa chỉ email của bạn" required value="<?php echo htmlspecialchars($email ?? ''); ?>" style="border-left: none; border-top-right-radius: var(--radius-md); border-bottom-right-radius: var(--radius-md); border-color: var(--border-color); background-color: transparent; color: var(--text-main); font-weight: 500; height: 46px; transition: var(--transition);">
+                    </div>
+                </div>
+
+                <div class="form-group mb-3">
                     <label for="username" class="small font-weight-bold mb-2" style="color: var(--text-main);">TÊN ĐĂNG NHẬP</label>
                     <div class="input-group">
                         <div class="input-group-prepend">

@@ -363,11 +363,12 @@ if (isset($_SESSION['cart'])) {
                             <div class="px-3 py-2 border-bottom mb-2 small text-muted">
                                 Quyền: <strong><?php echo $_SESSION['role'] === 'admin' ? 'Quản trị viên' : 'Khách hàng'; ?></strong>
                             </div>
+                            <a class="dropdown-item py-2 small font-weight-bold" href="<?php echo BASE_URL; ?>/Account/profile" style="border-radius: 4px; color: var(--text-main);"><i class="fa-solid fa-address-card mr-2 text-info"></i>Hồ sơ cá nhân</a>
                             <?php if ($_SESSION['role'] === 'admin'): ?>
                                 <a class="dropdown-item py-2 small font-weight-bold" href="<?php echo BASE_URL; ?>/Account/admin" style="border-radius: 4px; color: var(--text-main);"><i class="fa-solid fa-toolbox mr-2 text-primary"></i>Bảng điều khiển</a>
                                 <a class="dropdown-item py-2 small font-weight-bold" href="<?php echo BASE_URL; ?>/Product/add" style="border-radius: 4px; color: var(--text-main);"><i class="fa-solid fa-plus mr-2 text-success"></i>Thêm sản phẩm</a>
-                                <div class="dropdown-divider"></div>
                             <?php endif; ?>
+                            <div class="dropdown-divider"></div>
                             <a class="dropdown-item py-2 small text-danger font-weight-bold" href="<?php echo BASE_URL; ?>/Account/logout" style="border-radius: 4px;"><i class="fa-solid fa-arrow-right-from-bracket mr-2"></i>Đăng xuất</a>
                         </div>
                     </div>

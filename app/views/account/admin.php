@@ -16,6 +16,54 @@ $activeTab = $_GET['tab'] ?? 'orders';
             </a>
         </div>
         
+        <!-- Statistics Section -->
+        <div class="row mb-4">
+            <div class="col-md-3 mb-3">
+                <div class="premium-card p-4 d-flex align-items-center" style="border-radius: var(--radius-md); background: linear-gradient(135deg, rgba(79, 70, 229, 0.1), rgba(6, 182, 212, 0.05)); border: 1px solid var(--border-color);">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center bg-primary text-white" style="width: 50px; height: 50px; font-size: 20px;">
+                        <i class="fa-solid fa-coins"></i>
+                    </div>
+                    <div class="ml-3">
+                        <div class="small text-muted font-weight-bold">DOANH THU HỆ THỐNG</div>
+                        <h4 class="font-weight-bold mb-0 text-danger mt-1"><?php echo number_format($totalRevenue, 0, ',', '.'); ?> ₫</h4>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="premium-card p-4 d-flex align-items-center" style="border-radius: var(--radius-md); background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(6, 182, 212, 0.05)); border: 1px solid var(--border-color);">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center bg-success text-white" style="width: 50px; height: 50px; font-size: 20px;">
+                        <i class="fa-solid fa-receipt"></i>
+                    </div>
+                    <div class="ml-3">
+                        <div class="small text-muted font-weight-bold">TỔNG ĐƠN HÀNG</div>
+                        <h4 class="font-weight-bold mb-0 text-success mt-1"><?php echo $totalOrders; ?> đơn hàng</h4>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="premium-card p-4 d-flex align-items-center" style="border-radius: var(--radius-md); background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(239, 68, 68, 0.05)); border: 1px solid var(--border-color);">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center bg-warning text-white" style="width: 50px; height: 50px; font-size: 20px;">
+                        <i class="fa-solid fa-users"></i>
+                    </div>
+                    <div class="ml-3">
+                        <div class="small text-muted font-weight-bold">TỔNG THÀNH VIÊN</div>
+                        <h4 class="font-weight-bold mb-0 text-warning mt-1"><?php echo $totalUsers; ?> tài khoản</h4>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="premium-card p-4 d-flex align-items-center" style="border-radius: var(--radius-md); background: linear-gradient(135deg, rgba(6, 182, 212, 0.1), rgba(79, 70, 229, 0.05)); border: 1px solid var(--border-color);">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center bg-info text-white" style="width: 50px; height: 50px; font-size: 20px;">
+                        <i class="fa-solid fa-mobile-screen"></i>
+                    </div>
+                    <div class="ml-3">
+                        <div class="small text-muted font-weight-bold">TỔNG SẢN PHẨM</div>
+                        <h4 class="font-weight-bold mb-0 text-info mt-1"><?php echo count($products); ?> sản phẩm</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
         <!-- Dashboard Navigation Tabs -->
         <div class="premium-card p-3 mb-4" style="border-radius: var(--radius-md);">
             <ul class="nav nav-pills" id="adminTabs" role="tablist" style="gap: 8px;">
@@ -312,7 +360,9 @@ $activeTab = $_GET['tab'] ?? 'orders';
                                         <th>Mã</th>
                                         <th>Tên đăng nhập</th>
                                         <th>Họ và tên</th>
-                                        <th>Quyền hiện tại</th>
+                                        <th>Email / Xác thực</th>
+                                        <th>Quyền hạn</th>
+                                        <th>Trạng thái</th>
                                         <th class="text-right">Thay đổi vai trò</th>
                                     </tr>
                                 </thead>
@@ -320,8 +370,22 @@ $activeTab = $_GET['tab'] ?? 'orders';
                                     <?php foreach ($users as $user): ?>
                                         <tr>
                                             <td class="font-weight-bold">#<?php echo $user->id; ?></td>
-                                            <td class="font-weight-bold text-main"><?php echo htmlspecialchars($user->username); ?></td>
+                                            <td class="font-weight-bold text-main d-flex align-items-center">
+                                                <?php 
+                                                $avatarUrl = !empty($user->avatar) ? (strpos($user->avatar, 'http') === 0 ? $user->avatar : BASE_URL . '/' . $user->avatar) : 'https://api.dicebear.com/7.x/initials/svg?seed=' . urlencode($user->fullname ?? $user->username);
+                                                ?>
+                                                <img src="<?php echo htmlspecialchars($avatarUrl); ?>" class="rounded-circle mr-2 border" style="width: 32px; height: 32px; object-fit: cover;">
+                                                <?php echo htmlspecialchars($user->username); ?>
+                                            </td>
                                             <td><?php echo htmlspecialchars($user->fullname ?? 'Khách vãng lai'); ?></td>
+                                            <td>
+                                                <div class="small"><?php echo htmlspecialchars($user->email ?? 'Chưa thiết lập'); ?></div>
+                                                <?php if ($user->is_verified): ?>
+                                                    <span class="badge badge-success small py-0 px-1 text-white" style="font-size: 10px; border-radius: 3px;"><i class="fa-solid fa-check"></i> Đã xác thực</span>
+                                                <?php else: ?>
+                                                    <span class="badge badge-warning small py-0 px-1 text-dark" style="font-size: 10px; border-radius: 3px;"><i class="fa-solid fa-clock"></i> Chưa xác thực</span>
+                                                <?php endif; ?>
+                                            </td>
                                             <td>
                                                 <?php if ($user->role === 'admin'): ?>
                                                     <span class="badge badge-danger px-3 py-2 font-weight-bold" style="font-size: 11px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px;">
@@ -331,6 +395,13 @@ $activeTab = $_GET['tab'] ?? 'orders';
                                                     <span class="badge badge-secondary px-3 py-2 font-weight-bold" style="font-size: 11px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px;">
                                                         <i class="fa-solid fa-user mr-1"></i> Customer
                                                     </span>
+                                                <?php endif; ?>
+                                            </td>
+                                            <td>
+                                                <?php if ($user->is_locked): ?>
+                                                    <span class="badge badge-danger px-2 py-1 font-weight-bold" style="font-size: 11px; border-radius: 4px;"><i class="fa-solid fa-lock mr-1"></i> Bị khóa</span>
+                                                <?php else: ?>
+                                                    <span class="badge badge-success px-2 py-1 font-weight-bold" style="font-size: 11px; border-radius: 4px;"><i class="fa-solid fa-circle-check mr-1"></i> Hoạt động</span>
                                                 <?php endif; ?>
                                             </td>
                                             <td class="text-right">
@@ -345,10 +416,24 @@ $activeTab = $_GET['tab'] ?? 'orders';
                                                     </form>
                                                     
                                                     <?php if ($_SESSION['username'] != $user->username): ?>
+                                                        <!-- Nút Khóa / Mở khóa tài khoản -->
+                                                        <?php if ($user->is_locked): ?>
+                                                            <a href="<?php echo BASE_URL; ?>/Account/toggleUserLock/<?php echo $user->id; ?>" class="btn btn-sm btn-success d-flex align-items-center justify-content-center text-white" style="width: 32px; height: 32px; padding: 0; border-radius: 4px; border: 1px solid var(--success); background-color: var(--success);" title="Mở khóa tài khoản" onclick="return confirm('Bạn muốn mở khóa tài khoản này?');">
+                                                                <i class="fa-solid fa-lock-open" style="font-size: 12px;"></i>
+                                                            </a>
+                                                        <?php else: ?>
+                                                            <a href="<?php echo BASE_URL; ?>/Account/toggleUserLock/<?php echo $user->id; ?>" class="btn btn-sm btn-warning d-flex align-items-center justify-content-center text-white" style="width: 32px; height: 32px; padding: 0; border-radius: 4px;" title="Khóa tài khoản" onclick="return confirm('Bạn chắc chắn muốn khóa tài khoản này? Người dùng sẽ không thể đăng nhập!');">
+                                                                <i class="fa-solid fa-lock" style="font-size: 12px;"></i>
+                                                            </a>
+                                                        <?php endif; ?>
+
                                                         <a href="<?php echo BASE_URL; ?>/Account/deleteUser/<?php echo $user->id; ?>" class="btn btn-sm btn-outline-danger d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; padding: 0; border-radius: 4px;" title="Xóa tài khoản" onclick="return confirm('Bạn có chắc chắn muốn xóa tài khoản này? Thao tác này không thể hoàn tác!');">
                                                             <i class="fa-solid fa-trash-can" style="font-size: 12px;"></i>
                                                         </a>
                                                     <?php else: ?>
+                                                        <button class="btn btn-sm btn-outline-secondary d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; padding: 0; border-radius: 4px;" disabled title="Không thể khóa/xóa tài khoản của chính bạn">
+                                                            <i class="fa-solid fa-lock" style="font-size: 12px;"></i>
+                                                        </button>
                                                         <button class="btn btn-sm btn-outline-secondary d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; padding: 0; border-radius: 4px;" disabled title="Không thể xóa tài khoản của chính bạn">
                                                             <i class="fa-solid fa-trash-can" style="font-size: 12px;"></i>
                                                         </button>

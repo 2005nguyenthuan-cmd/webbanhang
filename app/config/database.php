@@ -32,21 +32,46 @@ class Database {
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 username VARCHAR(255) NOT NULL UNIQUE,
                 fullname VARCHAR(255) NOT NULL,
+                email VARCHAR(255) NULL,
+                avatar VARCHAR(255) NULL DEFAULT 'uploads/avatars/default.png',
                 password VARCHAR(255) NOT NULL,
-                role ENUM('admin', 'user') DEFAULT 'user'
+                role ENUM('admin', 'user') DEFAULT 'user',
+                is_locked TINYINT(1) DEFAULT 0,
+                is_verified TINYINT(1) DEFAULT 0,
+                remember_token VARCHAR(255) NULL,
+                reset_token VARCHAR(255) NULL,
+                verification_token VARCHAR(255) NULL
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
             $this->conn->exec($queryAccount);
+
+            // Add columns to account table if they do not exist (migration for existing table)
+            $columns = [
+                'email' => "ALTER TABLE account ADD COLUMN email VARCHAR(255) NULL AFTER fullname",
+                'avatar' => "ALTER TABLE account ADD COLUMN avatar VARCHAR(255) NULL DEFAULT 'uploads/avatars/default.png' AFTER email",
+                'is_locked' => "ALTER TABLE account ADD COLUMN is_locked TINYINT(1) DEFAULT 0 AFTER role",
+                'is_verified' => "ALTER TABLE account ADD COLUMN is_verified TINYINT(1) DEFAULT 0 AFTER is_locked",
+                'remember_token' => "ALTER TABLE account ADD COLUMN remember_token VARCHAR(255) NULL AFTER is_verified",
+                'reset_token' => "ALTER TABLE account ADD COLUMN reset_token VARCHAR(255) NULL AFTER remember_token",
+                'verification_token' => "ALTER TABLE account ADD COLUMN verification_token VARCHAR(255) NULL AFTER reset_token",
+            ];
+
+            foreach ($columns as $col => $alterQuery) {
+                $checkQuery = $this->conn->query("SHOW COLUMNS FROM account LIKE '$col'");
+                if ($checkQuery->rowCount() == 0) {
+                    $this->conn->exec($alterQuery);
+                }
+            }
 
             // Seed default account data
             $stmt = $this->conn->query("SELECT COUNT(*) FROM account");
             $count = $stmt->fetchColumn();
             if ($count == 0) {
                 $adminPass = password_hash('admin', PASSWORD_BCRYPT);
-                $stmtAdmin = $this->conn->prepare("INSERT INTO account (username, fullname, password, role) VALUES ('admin', 'Administrator', :pass, 'admin')");
+                $stmtAdmin = $this->conn->prepare("INSERT INTO account (username, fullname, email, password, role, is_verified) VALUES ('admin', 'Administrator', 'admin@techstore.com', :pass, 'admin', 1)");
                 $stmtAdmin->execute([':pass' => $adminPass]);
 
                 $userPass = password_hash('user', PASSWORD_BCRYPT);
-                $stmtUser = $this->conn->prepare("INSERT INTO account (username, fullname, password, role) VALUES ('user', 'Khách hàng thử nghiệm', :pass, 'user')");
+                $stmtUser = $this->conn->prepare("INSERT INTO account (username, fullname, email, password, role, is_verified) VALUES ('user', 'Khách hàng thử nghiệm', 'user@techstore.com', :pass, 'user', 1)");
                 $stmtUser->execute([':pass' => $userPass]);
             }
 
