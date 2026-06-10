@@ -13,22 +13,21 @@
                 <p class="text-muted small">Tạo tài khoản TechStore hoàn toàn miễn phí</p>
             </div>
 
-            <!-- Báo lỗi hệ thống hoặc nghiệp vụ -->
-            <?php if (isset($errors) && !empty($errors)): ?>
-                <div class="alert alert-danger alert-dismissible fade show" role="alert" style="border-radius: var(--radius-md); font-size: 14px; font-weight: 500;">
-                    <i class="fa-solid fa-circle-exclamation mr-1"></i> 
-                    <ul class="mb-0 pl-3">
-                        <?php foreach ($errors as $field => $errMsg): ?>
-                            <li><?php echo htmlspecialchars($errMsg); ?></li>
-                        <?php endforeach; ?>
-                    </ul>
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-            <?php endif; ?>
+            <!-- Alert Container -->
+            <div id="alertContainer">
+                <?php if (isset($errors) && count($errors) > 0): ?>
+                    <?php foreach ($errors as $err): ?>
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert" style="border-radius: var(--radius-md); font-size: 14px; font-weight: 500;">
+                            <i class="fa-solid fa-circle-exclamation mr-1"></i> <?php echo $err; ?>
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </div>
 
-            <!-- Form đăng ký -->
+            <!-- Form đăng ký - submit trực tiếp tới server -->
             <form action="<?php echo BASE_URL; ?>/Account/save" method="POST">
                 <div class="form-group mb-3">
                     <label for="fullname" class="small font-weight-bold mb-2" style="color: var(--text-main);">HỌ VÀ TÊN</label>

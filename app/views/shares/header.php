@@ -303,6 +303,10 @@ if (isset($_SESSION['cart'])) {
             border-color: var(--border-color) !important;
         }
     </style>
+    
+    <script>
+        const BASE_URL = '<?php echo BASE_URL; ?>';
+    </script>
 </head>
 <body>
 
@@ -322,11 +326,11 @@ if (isset($_SESSION['cart'])) {
                     </a>
                 </li>
                 <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
-                    <li class="nav-item <?php echo strpos($_SERVER['REQUEST_URI'], '/Account/admin') !== false ? 'active' : ''; ?>">
-                        <a class="nav-link" href="<?php echo BASE_URL; ?>/Account/admin">
-                            <i class="fa-solid fa-toolbox mr-1"></i> Quản lý
-                        </a>
-                    </li>
+                <li class="nav-item <?php echo (strpos($_SERVER['REQUEST_URI'], '/Account/admin') !== false) ? 'active' : ''; ?>">
+                    <a class="nav-link" href="<?php echo BASE_URL; ?>/Account/admin">
+                        <i class="fa-solid fa-toolbox mr-1"></i> Quản lý
+                    </a>
+                </li>
                 <?php endif; ?>
             </ul>
             
@@ -348,20 +352,20 @@ if (isset($_SESSION['cart'])) {
                 <a class="cart-icon-btn mr-2" href="<?php echo BASE_URL; ?>/Product/cart" title="Giỏ hàng của bạn">
                     <i class="fa-solid fa-bag-shopping"></i>
                     <?php if ($cartCount > 0): ?>
-                        <span class="cart-badge"><?php echo $cartCount; ?></span>
+                        <span class="cart-badge" id="cartBadgeCount"><?php echo $cartCount; ?></span>
                     <?php endif; ?>
                 </a>
 
                 <!-- User/Auth Section -->
                 <?php if (isset($_SESSION['username'])): ?>
                     <div class="dropdown">
-                        <button class="btn btn-outline-premium dropdown-toggle d-flex align-items-center py-2 px-3" type="button" id="userMenuBtn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="border-radius: var(--radius-md); font-size: 14px; gap: 6px; border: 1px solid var(--border-color); color: var(--text-main); background: var(--light); height: 42px;">
+                        <button class="btn dropdown-toggle d-flex align-items-center py-2 px-3" type="button" id="userMenuBtn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="border-radius: var(--radius-md); font-size: 14px; gap: 6px; border: 1px solid var(--border-color); color: var(--text-main); background: var(--light); height: 42px;">
                             <i class="fa-solid fa-circle-user" style="font-size: 16px;"></i>
                             <span class="d-none d-lg-inline">Hi, <?php echo htmlspecialchars($_SESSION['fullname'] ?? $_SESSION['username']); ?></span>
                         </button>
                         <div class="dropdown-menu dropdown-menu-right p-2 shadow-lg" aria-labelledby="userMenuBtn" style="border-radius: var(--radius-md); border: 1px solid var(--border-color); background-color: var(--card-bg); min-width: 200px;">
                             <div class="px-3 py-2 border-bottom mb-2 small text-muted">
-                                Quyền: <strong><?php echo $_SESSION['role'] === 'admin' ? 'Quản trị viên' : 'Khách hàng'; ?></strong>
+                                Quyền: <strong><?php echo ($_SESSION['role'] === 'admin') ? 'Quản trị viên' : 'Khách hàng'; ?></strong>
                             </div>
                             <a class="dropdown-item py-2 small font-weight-bold" href="<?php echo BASE_URL; ?>/Account/profile" style="border-radius: 4px; color: var(--text-main);"><i class="fa-solid fa-address-card mr-2 text-info"></i>Hồ sơ cá nhân</a>
                             <?php if ($_SESSION['role'] === 'admin'): ?>

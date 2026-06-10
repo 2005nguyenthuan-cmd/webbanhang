@@ -13,25 +13,25 @@
                 <p class="text-muted small">Nhập tên đăng nhập hoặc email đã đăng ký để tìm lại mật khẩu</p>
             </div>
 
-            <!-- Thông báo thành công gửi link -->
-            <?php if (isset($_SESSION['reset_success'])): ?>
-                <div class="alert alert-success alert-dismissible fade show" role="alert" style="border-radius: var(--radius-md); font-size: 14px; font-weight: 500;">
-                    <i class="fa-solid fa-circle-check mr-1"></i> <?php echo $_SESSION['reset_success']; unset($_SESSION['reset_success']); ?>
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-            <?php endif; ?>
-
-            <!-- Thông báo lỗi -->
-            <?php if (isset($_SESSION['reset_error'])): ?>
-                <div class="alert alert-danger alert-dismissible fade show" role="alert" style="border-radius: var(--radius-md); font-size: 14px; font-weight: 500;">
-                    <i class="fa-solid fa-circle-exclamation mr-1"></i> <?php echo $_SESSION['reset_error']; unset($_SESSION['reset_error']); ?>
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-            <?php endif; ?>
+            <!-- Alert Container -->
+            <div id="alertContainer">
+                <?php if (isset($_SESSION['reset_success'])): ?>
+                    <div class="alert alert-success alert-dismissible fade show" role="alert" style="border-radius: var(--radius-md); font-size: 14px; font-weight: 500;">
+                        <i class="fa-solid fa-circle-check mr-1"></i> <?php echo $_SESSION['reset_success']; unset($_SESSION['reset_success']); ?>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                <?php endif; ?>
+                <?php if (isset($_SESSION['reset_error'])): ?>
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert" style="border-radius: var(--radius-md); font-size: 14px; font-weight: 500;">
+                        <i class="fa-solid fa-circle-exclamation mr-1"></i> <?php echo $_SESSION['reset_error']; unset($_SESSION['reset_error']); ?>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                <?php endif; ?>
+            </div>
 
             <!-- Form quên mật khẩu -->
             <form action="<?php echo BASE_URL; ?>/Account/sendResetLink" method="POST">

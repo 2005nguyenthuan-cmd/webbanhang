@@ -13,25 +13,23 @@
                 <p class="text-muted small">Nhập mật khẩu mới cho tài khoản của bạn</p>
             </div>
 
-            <!-- Báo lỗi nếu có -->
-            <?php if (isset($errors) && !empty($errors)): ?>
-                <div class="alert alert-danger alert-dismissible fade show" role="alert" style="border-radius: var(--radius-md); font-size: 14px; font-weight: 500;">
-                    <i class="fa-solid fa-circle-exclamation mr-1"></i> 
-                    <ul class="mb-0 pl-3">
-                        <?php foreach ($errors as $field => $errMsg): ?>
-                            <li><?php echo htmlspecialchars($errMsg); ?></li>
-                        <?php endforeach; ?>
-                    </ul>
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-            <?php endif; ?>
+            <!-- Alert Container -->
+            <div id="alertContainer">
+                <?php if (isset($errors) && count($errors) > 0): ?>
+                    <?php foreach ($errors as $err): ?>
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert" style="border-radius: var(--radius-md); font-size: 14px; font-weight: 500;">
+                            <i class="fa-solid fa-circle-exclamation mr-1"></i> <?php echo $err; ?>
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </div>
 
             <!-- Form đặt lại mật khẩu -->
             <form action="<?php echo BASE_URL; ?>/Account/processResetPassword" method="POST">
-                <input type="hidden" name="token" value="<?php echo htmlspecialchars($token ?? $_POST['token'] ?? ''); ?>">
-
+                <input type="hidden" name="token" value="<?php echo htmlspecialchars($_GET['token'] ?? ''); ?>">
                 <div class="form-group mb-3">
                     <label for="password" class="small font-weight-bold mb-2" style="color: var(--text-main);">MẬT KHẨU MỚI</label>
                     <div class="input-group">

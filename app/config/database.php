@@ -49,9 +49,12 @@ class Database {
                 'email' => "ALTER TABLE account ADD COLUMN email VARCHAR(255) NULL AFTER fullname",
                 'avatar' => "ALTER TABLE account ADD COLUMN avatar VARCHAR(255) NULL DEFAULT 'uploads/avatars/default.png' AFTER email",
                 'is_locked' => "ALTER TABLE account ADD COLUMN is_locked TINYINT(1) DEFAULT 0 AFTER role",
-                'is_verified' => "ALTER TABLE account ADD COLUMN is_verified TINYINT(1) DEFAULT 0 AFTER is_locked",
+                'failed_attempts' => "ALTER TABLE account ADD COLUMN failed_attempts INT DEFAULT 0 AFTER is_locked",
+                'locked_until' => "ALTER TABLE account ADD COLUMN locked_until DATETIME NULL AFTER failed_attempts",
+                'is_verified' => "ALTER TABLE account ADD COLUMN is_verified TINYINT(1) DEFAULT 0 AFTER locked_until",
                 'remember_token' => "ALTER TABLE account ADD COLUMN remember_token VARCHAR(255) NULL AFTER is_verified",
-                'reset_token' => "ALTER TABLE account ADD COLUMN reset_token VARCHAR(255) NULL AFTER remember_token",
+                'refresh_token' => "ALTER TABLE account ADD COLUMN refresh_token VARCHAR(255) NULL AFTER remember_token",
+                'reset_token' => "ALTER TABLE account ADD COLUMN reset_token VARCHAR(255) NULL AFTER refresh_token",
                 'verification_token' => "ALTER TABLE account ADD COLUMN verification_token VARCHAR(255) NULL AFTER reset_token",
             ];
 
@@ -115,6 +118,18 @@ class Database {
             $checkStatusQuery = $this->conn->query("SHOW COLUMNS FROM orders LIKE 'status'");
             if ($checkStatusQuery->rowCount() == 0) {
                 $this->conn->exec("ALTER TABLE orders ADD COLUMN status VARCHAR(50) DEFAULT 'Đang xử lý' AFTER address");
+            }
+
+            // Add payment_method column if not exists
+            $checkPaymentMethodQuery = $this->conn->query("SHOW COLUMNS FROM orders LIKE 'payment_method'");
+            if ($checkPaymentMethodQuery->rowCount() == 0) {
+                $this->conn->exec("ALTER TABLE orders ADD COLUMN payment_method VARCHAR(50) DEFAULT 'COD' AFTER status");
+            }
+
+            // Add payment_status column if not exists
+            $checkPaymentStatusQuery = $this->conn->query("SHOW COLUMNS FROM orders LIKE 'payment_status'");
+            if ($checkPaymentStatusQuery->rowCount() == 0) {
+                $this->conn->exec("ALTER TABLE orders ADD COLUMN payment_status VARCHAR(50) DEFAULT 'Chưa thanh toán' AFTER payment_method");
             }
 
             // 5. Create order_details table

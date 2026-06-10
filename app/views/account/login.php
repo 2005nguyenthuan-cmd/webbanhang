@@ -13,27 +13,28 @@
                 <p class="text-muted small">Chào mừng bạn quay lại với TechStore</p>
             </div>
 
-            <!-- Thông báo thành công từ đăng ký -->
-            <?php if (isset($_SESSION['register_success'])): ?>
-                <div class="alert alert-success alert-dismissible fade show" role="alert" style="border-radius: var(--radius-md); font-size: 14px; font-weight: 500;">
-                    <i class="fa-solid fa-circle-check mr-1"></i> <?php echo $_SESSION['register_success']; unset($_SESSION['register_success']); ?>
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-            <?php endif; ?>
+            <!-- Alert Container -->
+            <div id="alertContainer">
+                <?php if (isset($_SESSION['register_success'])): ?>
+                    <div class="alert alert-success alert-dismissible fade show" role="alert" style="border-radius: var(--radius-md); font-size: 14px; font-weight: 500;">
+                        <i class="fa-solid fa-circle-check mr-1"></i> <?php echo $_SESSION['register_success']; unset($_SESSION['register_success']); ?>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                <?php endif; ?>
 
-            <!-- Thông báo lỗi đăng nhập -->
-            <?php if (isset($error)): ?>
-                <div class="alert alert-danger alert-dismissible fade show" role="alert" style="border-radius: var(--radius-md); font-size: 14px; font-weight: 500;">
-                    <i class="fa-solid fa-circle-exclamation mr-1"></i> <?php echo htmlspecialchars($error); ?>
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-            <?php endif; ?>
+                <?php if (isset($error)): ?>
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert" style="border-radius: var(--radius-md); font-size: 14px; font-weight: 500;">
+                        <i class="fa-solid fa-circle-exclamation mr-1"></i> <?php echo $error; ?>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                <?php endif; ?>
+            </div>
 
-            <!-- Form đăng nhập -->
+            <!-- Form đăng nhập - submit trực tiếp tới server -->
             <form action="<?php echo BASE_URL; ?>/Account/checkLogin" method="POST">
                 <div class="form-group mb-4">
                     <label for="username" class="small font-weight-bold mb-2" style="color: var(--text-main);">TÊN ĐĂNG NHẬP</label>

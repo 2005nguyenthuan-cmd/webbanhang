@@ -15,32 +15,27 @@
                 <div class="premium-card p-4 text-center">
                     <div class="avatar-container position-relative d-inline-block mb-3">
                         <?php 
-                        $avatarUrl = !empty($user->avatar) ? (strpos($user->avatar, 'http') === 0 ? $user->avatar : BASE_URL . '/' . $user->avatar) : 'https://api.dicebear.com/7.x/initials/svg?seed=' . urlencode($user->fullname);
+                        $avatarUrl = !empty($user->avatar) ? (strpos($user->avatar, 'http') === 0 ? $user->avatar : BASE_URL . '/' . $user->avatar) : 'https://api.dicebear.com/7.x/initials/svg?seed=' . urlencode($user->fullname ?? $user->username); 
                         ?>
-                        <img src="<?php echo htmlspecialchars($avatarUrl); ?>" 
+                        <img id="userAvatar" src="<?php echo htmlspecialchars($avatarUrl); ?>" 
                              alt="Avatar" 
                              class="rounded-circle img-thumbnail border border-primary shadow-sm" 
                              style="width: 130px; height: 130px; object-fit: cover;">
                         
-                        <?php if ($user->is_verified): ?>
-                            <span class="position-absolute d-flex align-items-center justify-content-center bg-success text-white rounded-circle shadow" 
-                                  style="width: 28px; height: 28px; bottom: 5px; right: 5px; font-size: 12px; border: 2px solid var(--card-bg);" 
-                                  title="Tài khoản đã xác thực">
+                        <span id="userVerifyBadge" class="position-absolute d-flex align-items-center justify-content-center text-white rounded-circle shadow <?php echo $user->is_verified ? 'bg-success' : 'bg-warning text-dark'; ?>" 
+                              style="width: 28px; height: 28px; bottom: 5px; right: 5px; font-size: 12px; border: 2px solid var(--card-bg);">
+                            <?php if ($user->is_verified): ?>
                                 <i class="fa-solid fa-check"></i>
-                            </span>
-                        <?php else: ?>
-                            <span class="position-absolute d-flex align-items-center justify-content-center bg-warning text-dark rounded-circle shadow" 
-                                  style="width: 28px; height: 28px; bottom: 5px; right: 5px; font-size: 12px; border: 2px solid var(--card-bg);" 
-                                  title="Chưa xác thực email">
+                            <?php else: ?>
                                 <i class="fa-solid fa-triangle-exclamation"></i>
-                            </span>
-                        <?php endif; ?>
+                            <?php endif; ?>
+                        </span>
                     </div>
                     
-                    <h4 class="font-weight-bold mb-1 text-main"><?php echo htmlspecialchars($user->fullname); ?></h4>
-                    <p class="text-muted small mb-3">@<?php echo htmlspecialchars($user->username); ?></p>
+                    <h4 id="userFullName" class="font-weight-bold mb-1 text-main"><?php echo htmlspecialchars($user->fullname); ?></h4>
+                    <p id="userUsername" class="text-muted small mb-3">@<?php echo htmlspecialchars($user->username); ?></p>
                     
-                    <div class="mb-3">
+                    <div class="mb-3" id="userBadgeContainer">
                         <?php if ($user->role === 'admin'): ?>
                             <span class="badge badge-danger px-3 py-2 font-weight-bold" style="font-size: 11px; border-radius: 4px; text-transform: uppercase;">
                                 <i class="fa-solid fa-shield-halved mr-1"></i> Quản trị viên
@@ -55,14 +50,16 @@
                     <hr class="my-4" style="border-color: var(--border-color);">
                     
                     <div class="text-left">
-                        <div class="small mb-2 text-muted"><i class="fa-regular fa-envelope mr-2"></i><strong>Email:</strong> <?php echo htmlspecialchars($user->email ?? 'Chưa cập nhật'); ?></div>
+                        <div class="small mb-2 text-muted"><i class="fa-regular fa-envelope mr-2"></i><strong>Email:</strong> <span id="userEmailText"><?php echo htmlspecialchars($user->email ?? 'Chưa cập nhật'); ?></span></div>
                         <div class="small mb-2 text-muted">
                             <i class="fa-solid fa-circle-check mr-2"></i><strong>Xác thực:</strong> 
-                            <?php if ($user->is_verified): ?>
-                                <span class="text-success font-weight-bold">Đã xác minh</span>
-                            <?php else: ?>
-                                <span class="text-warning font-weight-bold">Chưa xác minh</span>
-                            <?php endif; ?>
+                            <span id="userVerificationText">
+                                <?php if ($user->is_verified): ?>
+                                    <span class="text-success font-weight-bold">Đã xác minh</span>
+                                <?php else: ?>
+                                    <span class="text-warning font-weight-bold">Chưa xác minh</span>
+                                <?php endif; ?>
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -72,23 +69,24 @@
             <div class="col-md-8">
                 
                 <!-- PROFILE UPDATE SUCCESS/ERROR ALERTS -->
-                <?php if (isset($_SESSION['profile_success'])): ?>
-                    <div class="alert alert-success alert-dismissible fade show" role="alert" style="border-radius: var(--radius-md);">
-                        <i class="fa-solid fa-circle-check mr-1"></i> <?php echo $_SESSION['profile_success']; unset($_SESSION['profile_success']); ?>
-                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                <?php endif; ?>
-                
-                <?php if (isset($_SESSION['profile_error'])): ?>
-                    <div class="alert alert-danger alert-dismissible fade show" role="alert" style="border-radius: var(--radius-md);">
-                        <i class="fa-solid fa-circle-exclamation mr-1"></i> <?php echo $_SESSION['profile_error']; unset($_SESSION['profile_error']); ?>
-                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                <?php endif; ?>
+                <div id="profileAlert">
+                    <?php if (isset($_SESSION['profile_success'])): ?>
+                        <div class="alert alert-success alert-dismissible fade show" role="alert" style="border-radius: var(--radius-md);">
+                            <i class="fa-solid fa-circle-check mr-1"></i> <?php echo $_SESSION['profile_success']; unset($_SESSION['profile_success']); ?>
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    <?php endif; ?>
+                    <?php if (isset($_SESSION['profile_error'])): ?>
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert" style="border-radius: var(--radius-md);">
+                            <i class="fa-solid fa-circle-exclamation mr-1"></i> <?php echo $_SESSION['profile_error']; unset($_SESSION['profile_error']); ?>
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    <?php endif; ?>
+                </div>
 
                 <!-- TAB CARD: ACCOUNT DETAILS -->
                 <div class="premium-card p-4 mb-4">
@@ -110,7 +108,7 @@
                             <label for="avatar" class="small font-weight-bold text-muted mb-2">TẢI LÊN ẢNH ĐẠI DIỆN MỚI</label>
                             <div class="custom-file">
                                 <input type="file" class="custom-file-input" id="avatar" name="avatar" accept="image/*">
-                                <label class="custom-file-label" for="avatar" style="border-radius: var(--radius-md); border-color: var(--border-color); background: transparent; color: var(--text-muted); font-weight: 500; height: 44px; line-height: 30px;">Chọn tệp hình ảnh...</label>
+                                <label class="custom-file-label" id="avatarLabel" for="avatar" style="border-radius: var(--radius-md); border-color: var(--border-color); background: transparent; color: var(--text-muted); font-weight: 500; height: 44px; line-height: 30px;">Chọn tệp hình ảnh...</label>
                             </div>
                             <small class="form-text text-muted mt-2">Định dạng hỗ trợ: JPG, PNG, GIF. Dung lượng tối đa: 5MB.</small>
                         </div>
@@ -122,23 +120,24 @@
                 </div>
 
                 <!-- PASSWORD SECURITY SUCCESS/ERROR ALERTS -->
-                <?php if (isset($_SESSION['pw_success'])): ?>
-                    <div class="alert alert-success alert-dismissible fade show" role="alert" style="border-radius: var(--radius-md);">
-                        <i class="fa-solid fa-circle-check mr-1"></i> <?php echo $_SESSION['pw_success']; unset($_SESSION['pw_success']); ?>
-                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                <?php endif; ?>
-                
-                <?php if (isset($_SESSION['pw_error'])): ?>
-                    <div class="alert alert-danger alert-dismissible fade show" role="alert" style="border-radius: var(--radius-md);">
-                        <i class="fa-solid fa-circle-exclamation mr-1"></i> <?php echo $_SESSION['pw_error']; unset($_SESSION['pw_error']); ?>
-                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                <?php endif; ?>
+                <div id="passwordAlert">
+                    <?php if (isset($_SESSION['pw_success'])): ?>
+                        <div class="alert alert-success alert-dismissible fade show" role="alert" style="border-radius: var(--radius-md);">
+                            <i class="fa-solid fa-circle-check mr-1"></i> <?php echo $_SESSION['pw_success']; unset($_SESSION['pw_success']); ?>
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    <?php endif; ?>
+                    <?php if (isset($_SESSION['pw_error'])): ?>
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert" style="border-radius: var(--radius-md);">
+                            <i class="fa-solid fa-circle-exclamation mr-1"></i> <?php echo $_SESSION['pw_error']; unset($_SESSION['pw_error']); ?>
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    <?php endif; ?>
+                </div>
 
                 <!-- TAB CARD: CHANGE PASSWORD -->
                 <div class="premium-card p-4">
@@ -174,14 +173,15 @@
 </div>
 
 <script>
-    // Show selected file name in bootstrap custom file input
     document.addEventListener('DOMContentLoaded', function() {
         const fileInput = document.getElementById('avatar');
         if (fileInput) {
             fileInput.addEventListener('change', function(e) {
                 const fileName = e.target.files[0].name;
-                const nextSibling = e.target.nextElementSibling;
-                nextSibling.innerText = fileName;
+                const label = document.getElementById('avatarLabel');
+                if (label) {
+                    label.innerText = fileName;
+                }
             });
         }
     });

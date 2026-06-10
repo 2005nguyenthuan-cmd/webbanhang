@@ -1,0 +1,1837 @@
+{
+	"info": {
+		"_postman_id": "techstore-api-2026",
+		"name": "TechStore Web API",
+		"description": "Bộ sưu tập API kiểm thử cho website TechStore - Chuyển đổi từ MVC sang Web API.\n\n## Hướng dẫn sử dụng:\n1. Import file này vào Postman\n2. Tạo Environment với biến `base_url` = `http://webbanhang.test` (hoặc URL Laragon của bạn)\n3. Chạy request **Login (Admin)** trước tiên để tự động lưu token\n4. Các request cần xác thực sẽ tự động dùng `{{token}}` từ biến môi trường\n\n## Biến môi trường cần thiết:\n- `base_url`: URL gốc của website (vd: http://webbanhang.test)\n- `token`: JWT access token (tự động set sau khi login)\n- `refresh_token`: Refresh token (tự động set sau khi login)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8080/",
+			"type": "string"
+		},
+		{
+			"key": "token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "refresh_token",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "🔐 Account",
+			"description": "API xác thực và quản lý tài khoản",
+			"item": [
+				{
+					"name": "Đăng ký tài khoản",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"testuser\",\n    \"fullname\": \"Nguyen Van Test\",\n    \"email\": \"testuser@example.com\",\n    \"password\": \"123456\",\n    \"confirmpassword\": \"123456\",\n    \"role\": \"user\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/account/register",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"account",
+								"register"
+							]
+						},
+						"description": "POST /api/account/register\n\nĐăng ký tài khoản mới. Gửi email xác thực sau khi đăng ký."
+					}
+				},
+				{
+					"name": "Đăng nhập (Admin)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.success && jsonData.token) {",
+									"    pm.collectionVariables.set('token', jsonData.token);",
+									"    console.log('✅ Token saved!');",
+									"}",
+									"if (jsonData.refresh_token) {",
+									"    pm.collectionVariables.set('refresh_token', jsonData.refresh_token);",
+									"    console.log('✅ Refresh token saved!');",
+									"}",
+									"",
+									"pm.test('Login thành công', function () {",
+									"    pm.expect(jsonData.success).to.be.true;",
+									"    pm.expect(jsonData.token).to.be.a('string');",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"admin\",\n    \"password\": \"123456\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/account/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"account",
+								"login"
+							]
+						},
+						"description": "POST /api/account/login\n\n⭐ CHẠY REQUEST NÀY TRƯỚC TIÊN!\n\nĐăng nhập với tài khoản admin. Token sẽ tự động được lưu vào biến `token` để sử dụng cho các request khác.\n\n**Lưu ý**: Đăng nhập sai 5 lần liên tiếp sẽ bị khóa tài khoản 15 phút."
+					}
+				},
+				{
+					"name": "Đăng nhập (User)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.success && jsonData.token) {",
+									"    pm.collectionVariables.set('token', jsonData.token);",
+									"    console.log('✅ User token saved!');",
+									"}",
+									"if (jsonData.refresh_token) {",
+									"    pm.collectionVariables.set('refresh_token', jsonData.refresh_token);",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"testuser\",\n    \"password\": \"123456\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/account/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"account",
+								"login"
+							]
+						},
+						"description": "POST /api/account/login\n\nĐăng nhập bằng tài khoản user thường. Dùng để test phân quyền (role-based access)."
+					}
+				},
+				{
+					"name": "Đăng nhập sai (Test khóa TK)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"admin\",\n    \"password\": \"wrongpassword\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/account/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"account",
+								"login"
+							]
+						},
+						"description": "POST /api/account/login\n\nTest đăng nhập sai mật khẩu. Gửi 5 lần liên tiếp để kiểm tra tính năng khóa tài khoản (locked_until 15 phút)."
+					}
+				},
+				{
+					"name": "Refresh Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.success && jsonData.token) {",
+									"    pm.collectionVariables.set('token', jsonData.token);",
+									"    console.log('✅ New access token saved!');",
+									"}",
+									"",
+									"pm.test('Refresh token thành công', function () {",
+									"    pm.expect(jsonData.success).to.be.true;",
+									"    pm.expect(jsonData.token).to.be.a('string');",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"refresh_token\": \"{{refresh_token}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/account/refresh-token",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"account",
+								"refresh-token"
+							]
+						},
+						"description": "POST /api/account/refresh-token\n\nĐổi refresh token lấy access token mới. Dùng khi access token hết hạn (1 giờ)."
+					}
+				},
+				{
+					"name": "Xem hồ sơ cá nhân",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/account/profile",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"account",
+								"profile"
+							]
+						},
+						"description": "GET /api/account/profile\n\n🔒 Yêu cầu token.\nLấy thông tin hồ sơ người dùng hiện tại."
+					}
+				},
+				{
+					"name": "Cập nhật hồ sơ (JSON)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "fullname",
+									"value": "Admin Updated",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "admin_updated@example.com",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/account/profile",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"account",
+								"profile"
+							]
+						},
+						"description": "POST /api/account/profile\n\n🔒 Yêu cầu token.\nCập nhật họ tên, email. Dùng form-data để có thể kèm file avatar."
+					}
+				},
+				{
+					"name": "Cập nhật hồ sơ (với Avatar)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "fullname",
+									"value": "Admin TechStore",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "admin@techstore.vn",
+									"type": "text"
+								},
+								{
+									"key": "avatar",
+									"type": "file",
+									"src": ""
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/account/profile",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"account",
+								"profile"
+							]
+						},
+						"description": "POST /api/account/profile\n\n🔒 Yêu cầu token.\nCập nhật hồ sơ kèm upload ảnh đại diện (avatar). Chọn file ảnh ở trường `avatar`."
+					}
+				},
+				{
+					"name": "Đổi mật khẩu",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"old_password\": \"123456\",\n    \"new_password\": \"654321\",\n    \"confirm_password\": \"654321\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/account/change-password",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"account",
+								"change-password"
+							]
+						},
+						"description": "PUT /api/account/change-password\n\n🔒 Yêu cầu token.\nĐổi mật khẩu. Cần nhập mật khẩu cũ chính xác."
+					}
+				},
+				{
+					"name": "Quên mật khẩu",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username_or_email\": \"admin\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/account/forgot-password",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"account",
+								"forgot-password"
+							]
+						},
+						"description": "POST /api/account/forgot-password\n\n🔓 Không cần token.\nGửi email chứa link đặt lại mật khẩu."
+					}
+				},
+				{
+					"name": "Đặt lại mật khẩu",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"token\": \"PASTE_RESET_TOKEN_HERE\",\n    \"password\": \"newpassword123\",\n    \"confirmpassword\": \"newpassword123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/account/reset-password",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"account",
+								"reset-password"
+							]
+						},
+						"description": "POST /api/account/reset-password\n\n🔓 Không cần token.\nĐặt lại mật khẩu bằng reset token nhận từ email."
+					}
+				},
+				{
+					"name": "📋 Danh sách tài khoản (Admin)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/account/users",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"account",
+								"users"
+							]
+						},
+						"description": "GET /api/account/users\n\n🔒 Yêu cầu token Admin.\nLấy danh sách tất cả tài khoản trong hệ thống."
+					}
+				},
+				{
+					"name": "Cập nhật vai trò (Admin)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"user_id\": 2,\n    \"role\": \"admin\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/account/update-role",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"account",
+								"update-role"
+							]
+						},
+						"description": "PUT /api/account/update-role\n\n🔒 Yêu cầu token Admin.\nThay đổi vai trò người dùng (user/admin). Không thể tự đổi vai trò của chính mình."
+					}
+				},
+				{
+					"name": "Khóa/Mở khóa tài khoản (Admin)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"user_id\": 2\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/account/toggle-lock",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"account",
+								"toggle-lock"
+							]
+						},
+						"description": "PUT /api/account/toggle-lock\n\n🔒 Yêu cầu token Admin.\nBật/tắt trạng thái khóa tài khoản. Không thể tự khóa chính mình."
+					}
+				},
+				{
+					"name": "Xóa tài khoản (Admin)",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"user_id\": 5\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/account/delete-user",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"account",
+								"delete-user"
+							]
+						},
+						"description": "DELETE /api/account/delete-user\n\n🔒 Yêu cầu token Admin.\nXóa vĩnh viễn tài khoản người dùng. Không thể tự xóa chính mình."
+					}
+				},
+				{
+					"name": "❌ Test: Không có token",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/account/profile",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"account",
+								"profile"
+							]
+						},
+						"description": "GET /api/account/profile\n\n🧪 Test case: Gọi API cần token mà không gửi token → Expected: 401 Unauthorized."
+					}
+				},
+				{
+					"name": "❌ Test: Token giả/hết hạn",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.INVALID.TOKEN"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/account/profile",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"account",
+								"profile"
+							]
+						},
+						"description": "GET /api/account/profile\n\n🧪 Test case: Gửi token không hợp lệ → Expected: 401 Unauthorized."
+					}
+				}
+			]
+		},
+		{
+			"name": "📦 Products",
+			"description": "API quản lý sản phẩm",
+			"item": [
+				{
+					"name": "Danh sách sản phẩm",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/products",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"products"
+							]
+						},
+						"description": "GET /api/products\n\n🔓 Không cần token.\nLấy danh sách sản phẩm (mặc định page=1, limit=10)."
+					}
+				},
+				{
+					"name": "Danh sách SP (Phân trang)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/products?page=2&limit=5",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"products"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "2"
+								},
+								{
+									"key": "limit",
+									"value": "5"
+								}
+							]
+						},
+						"description": "GET /api/products?page=2&limit=5\n\n🔓 Không cần token.\nPhân trang: lấy trang thứ 2, mỗi trang 5 sản phẩm."
+					}
+				},
+				{
+					"name": "Tìm kiếm SP theo tên",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/products?keyword=iphone",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"products"
+							],
+							"query": [
+								{
+									"key": "keyword",
+									"value": "iphone"
+								}
+							]
+						},
+						"description": "GET /api/products?keyword=iphone\n\n🔓 Không cần token.\nTìm kiếm sản phẩm theo từ khóa trong tên và mô tả."
+					}
+				},
+				{
+					"name": "Lọc SP theo danh mục",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/products?category_id=1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"products"
+							],
+							"query": [
+								{
+									"key": "category_id",
+									"value": "1"
+								}
+							]
+						},
+						"description": "GET /api/products?category_id=1\n\n🔓 Không cần token.\nLọc sản phẩm theo ID danh mục."
+					}
+				},
+				{
+					"name": "Sắp xếp SP theo giá (Tăng dần)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/products?sort_by=price_asc",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"products"
+							],
+							"query": [
+								{
+									"key": "sort_by",
+									"value": "price_asc"
+								}
+							]
+						},
+						"description": "GET /api/products?sort_by=price_asc\n\n🔓 Không cần token.\nSắp xếp theo giá tăng dần."
+					}
+				},
+				{
+					"name": "Sắp xếp SP theo giá (Giảm dần)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/products?sort_by=price_desc",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"products"
+							],
+							"query": [
+								{
+									"key": "sort_by",
+									"value": "price_desc"
+								}
+							]
+						},
+						"description": "GET /api/products?sort_by=price_desc\n\n🔓 Không cần token.\nSắp xếp theo giá giảm dần."
+					}
+				},
+				{
+					"name": "Lọc SP theo khoảng giá",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/products?min_price=5000000&max_price=20000000",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"products"
+							],
+							"query": [
+								{
+									"key": "min_price",
+									"value": "5000000"
+								},
+								{
+									"key": "max_price",
+									"value": "20000000"
+								}
+							]
+						},
+						"description": "GET /api/products?min_price=5000000&max_price=20000000\n\n🔓 Không cần token.\nLọc sản phẩm có giá từ 5 triệu đến 20 triệu."
+					}
+				},
+				{
+					"name": "Kết hợp tìm kiếm + lọc + sắp xếp",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/products?keyword=samsung&category_id=1&min_price=1000000&sort_by=price_asc&page=1&limit=10",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"products"
+							],
+							"query": [
+								{
+									"key": "keyword",
+									"value": "samsung"
+								},
+								{
+									"key": "category_id",
+									"value": "1"
+								},
+								{
+									"key": "min_price",
+									"value": "1000000"
+								},
+								{
+									"key": "sort_by",
+									"value": "price_asc"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						},
+						"description": "GET /api/products?keyword=samsung&category_id=1&min_price=1000000&sort_by=price_asc&page=1&limit=10\n\n🔓 Không cần token.\nKết hợp nhiều bộ lọc: tìm kiếm + danh mục + khoảng giá + sắp xếp + phân trang."
+					}
+				},
+				{
+					"name": "Chi tiết sản phẩm",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/products/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"products",
+								"1"
+							]
+						},
+						"description": "GET /api/products/{id}\n\n🔓 Không cần token.\nLấy chi tiết sản phẩm theo ID."
+					}
+				},
+				{
+					"name": "Thêm sản phẩm (Admin - JSON)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"iPhone 16 Pro Max\",\n    \"description\": \"Điện thoại Apple iPhone 16 Pro Max chính hãng, chip A18 Pro, camera 48MP.\",\n    \"price\": 34990000,\n    \"category_id\": 1,\n    \"image\": \"uploads/iphone16.jpg\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/products",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"products"
+							]
+						},
+						"description": "POST /api/products\n\n🔒 Yêu cầu token Admin.\nThêm sản phẩm mới bằng JSON body.\n\n**Validation:**\n- Tên sản phẩm không được rỗng\n- Giá phải > 0\n- Danh mục phải tồn tại"
+					}
+				},
+				{
+					"name": "Thêm sản phẩm (Admin - FormData + Ảnh)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "Samsung Galaxy S25 Ultra",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "Điện thoại Samsung Galaxy S25 Ultra, chip Snapdragon 8 Gen 4.",
+									"type": "text"
+								},
+								{
+									"key": "price",
+									"value": "29990000",
+									"type": "text"
+								},
+								{
+									"key": "category_id",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "image",
+									"type": "file",
+									"src": ""
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/products",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"products"
+							]
+						},
+						"description": "POST /api/products\n\n🔒 Yêu cầu token Admin.\nThêm sản phẩm mới kèm upload ảnh. Chọn file ảnh ở trường `image`."
+					}
+				},
+				{
+					"name": "Cập nhật sản phẩm (Admin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "iPhone 16 Pro Max (Updated)",
+									"type": "text"
+								},
+								{
+									"key": "price",
+									"value": "35990000",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "iPhone 16 Pro Max - Phiên bản cập nhật mới nhất 2026.",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/products/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"products",
+								"1"
+							]
+						},
+						"description": "POST /api/products/{id}\n\n🔒 Yêu cầu token Admin.\nCập nhật sản phẩm. Dùng POST thay vì PUT để hỗ trợ upload file."
+					}
+				},
+				{
+					"name": "Xóa sản phẩm (Admin)",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/products/99",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"products",
+								"99"
+							]
+						},
+						"description": "DELETE /api/products/{id}\n\n🔒 Yêu cầu token Admin.\nXóa sản phẩm theo ID."
+					}
+				},
+				{
+					"name": "Upload ảnh sản phẩm (Admin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "image",
+									"type": "file",
+									"src": ""
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/products/upload-image",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"products",
+								"upload-image"
+							]
+						},
+						"description": "POST /api/products/upload-image\n\n🔒 Yêu cầu token Admin.\nUpload ảnh riêng lẻ, trả về đường dẫn ảnh.\n\n**Giới hạn:**\n- Tối đa 10MB\n- Định dạng: JPG, JPEG, PNG, GIF, WEBP"
+					}
+				},
+				{
+					"name": "❌ Test: Thêm SP - Tên rỗng",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"\",\n    \"price\": 10000000,\n    \"category_id\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/products",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"products"
+							]
+						},
+						"description": "🧪 Test validation: Tên sản phẩm rỗng → Expected: 400 Bad Request."
+					}
+				},
+				{
+					"name": "❌ Test: Thêm SP - Giá <= 0",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Test Product\",\n    \"price\": -5000,\n    \"category_id\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/products",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"products"
+							]
+						},
+						"description": "🧪 Test validation: Giá <= 0 → Expected: 400 Bad Request."
+					}
+				},
+				{
+					"name": "❌ Test: Thêm SP - Danh mục không hợp lệ",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Test Product\",\n    \"price\": 10000000,\n    \"category_id\": 9999\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/products",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"products"
+							]
+						},
+						"description": "🧪 Test validation: Danh mục không tồn tại → Expected: 400 Bad Request."
+					}
+				},
+				{
+					"name": "❌ Test: Thêm SP - User thường (403)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Hacked Product\",\n    \"price\": 1000,\n    \"category_id\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/products",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"products"
+							]
+						},
+						"description": "🧪 Test phân quyền: Đăng nhập bằng User thường rồi thử thêm sản phẩm → Expected: 403 Forbidden.\n\n⚠️ Trước khi chạy, login bằng request \"Đăng nhập (User)\" để lấy token user."
+					}
+				}
+			]
+		},
+		{
+			"name": "🏷️ Categories",
+			"description": "API quản lý danh mục sản phẩm",
+			"item": [
+				{
+					"name": "Danh sách danh mục",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/categories",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"categories"
+							]
+						},
+						"description": "GET /api/categories\n\n🔓 Không cần token.\nLấy tất cả danh mục sản phẩm."
+					}
+				},
+				{
+					"name": "Chi tiết danh mục",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/categories/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"categories",
+								"1"
+							]
+						},
+						"description": "GET /api/categories/{id}\n\n🔓 Không cần token.\nLấy chi tiết danh mục theo ID."
+					}
+				},
+				{
+					"name": "Thêm danh mục (Admin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Máy tính bảng\",\n    \"description\": \"Các loại tablet iPad, Samsung Tab, Xiaomi Pad...\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/categories",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"categories"
+							]
+						},
+						"description": "POST /api/categories\n\n🔒 Yêu cầu token Admin.\nThêm danh mục mới."
+					}
+				},
+				{
+					"name": "Cập nhật danh mục (Admin)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Máy tính bảng (Updated)\",\n    \"description\": \"Tablet chính hãng - iPad, Samsung Tab, Xiaomi Pad\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/categories/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"categories",
+								"1"
+							]
+						},
+						"description": "PUT /api/categories/{id}\n\n🔒 Yêu cầu token Admin.\nCập nhật tên và mô tả danh mục."
+					}
+				},
+				{
+					"name": "Xóa danh mục (Admin)",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/categories/99",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"categories",
+								"99"
+							]
+						},
+						"description": "DELETE /api/categories/{id}\n\n🔒 Yêu cầu token Admin.\nXóa danh mục. Không thể xóa nếu danh mục còn chứa sản phẩm."
+					}
+				},
+				{
+					"name": "❌ Test: Xóa DM còn sản phẩm",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/categories/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"categories",
+								"1"
+							]
+						},
+						"description": "🧪 Test: Xóa danh mục vẫn còn sản phẩm → Expected: 400 Bad Request."
+					}
+				}
+			]
+		},
+		{
+			"name": "🛒 Cart",
+			"description": "API giỏ hàng (session-based)",
+			"item": [
+				{
+					"name": "Xem giỏ hàng",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/cart",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"cart"
+							]
+						},
+						"description": "GET /api/cart\n\n🔓 Không cần token (session-based).\nLấy nội dung giỏ hàng hiện tại, tổng tiền và tổng số lượng."
+					}
+				},
+				{
+					"name": "Thêm SP vào giỏ hàng",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"product_id\": 1,\n    \"quantity\": 2,\n    \"color\": \"Đen Nhám\",\n    \"storage\": \"256 GB\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/cart",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"cart"
+							]
+						},
+						"description": "POST /api/cart\n\n🔓 Không cần token (session-based).\nThêm sản phẩm vào giỏ hàng.\n\n**Validation:**\n- product_id bắt buộc\n- quantity > 0\n- Sản phẩm phải tồn tại"
+					}
+				},
+				{
+					"name": "Thêm SP khác vào giỏ",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"product_id\": 2,\n    \"quantity\": 1,\n    \"color\": \"Trắng\",\n    \"storage\": \"128 GB\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/cart",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"cart"
+							]
+						},
+						"description": "POST /api/cart\n\nThêm sản phẩm thứ 2 vào giỏ hàng để test nhiều item."
+					}
+				},
+				{
+					"name": "Cập nhật số lượng trong giỏ",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"cart_key\": \"1_nNhm_256GB\",\n    \"quantity\": 5\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/cart",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"cart"
+							]
+						},
+						"description": "PUT /api/cart\n\n🔓 Không cần token (session-based).\nCập nhật số lượng sản phẩm trong giỏ hàng.\n\n⚠️ Lấy `cart_key` từ response của GET /api/cart (trường `key` trong mỗi item)."
+					}
+				},
+				{
+					"name": "Xóa 1 SP khỏi giỏ",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/cart/1_nNhm_256GB",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"cart",
+								"1_nNhm_256GB"
+							]
+						},
+						"description": "DELETE /api/cart/{cart_key}\n\n🔓 Không cần token (session-based).\nXóa 1 sản phẩm cụ thể khỏi giỏ hàng.\n\n⚠️ Thay `cart_key` bằng key thực tế từ GET /api/cart."
+					}
+				},
+				{
+					"name": "Xóa toàn bộ giỏ hàng",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/cart",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"cart"
+							]
+						},
+						"description": "DELETE /api/cart\n\n🔓 Không cần token (session-based).\nLàm trống toàn bộ giỏ hàng."
+					}
+				},
+				{
+					"name": "❌ Test: Thêm SP không tồn tại",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"product_id\": 99999,\n    \"quantity\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/cart",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"cart"
+							]
+						},
+						"description": "🧪 Test: Thêm sản phẩm có ID không tồn tại → Expected: 404."
+					}
+				},
+				{
+					"name": "❌ Test: Số lượng <= 0",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"product_id\": 1,\n    \"quantity\": 0\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/cart",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"cart"
+							]
+						},
+						"description": "🧪 Test: Thêm với số lượng = 0 → Expected: 400 Bad Request."
+					}
+				}
+			]
+		},
+		{
+			"name": "📋 Orders",
+			"description": "API quản lý đơn hàng",
+			"item": [
+				{
+					"name": "⚠️ Chuẩn bị: Thêm SP vào giỏ trước",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"product_id\": 1,\n    \"quantity\": 2,\n    \"color\": \"Đen\",\n    \"storage\": \"256 GB\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/cart",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"cart"
+							]
+						},
+						"description": "⚠️ CHẠY TRƯỚC KHI ĐẶT HÀNG!\n\nThêm sản phẩm vào giỏ hàng để có thể tạo đơn hàng."
+					}
+				},
+				{
+					"name": "Tạo đơn hàng",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.success && jsonData.order_id) {",
+									"    pm.collectionVariables.set('order_id', jsonData.order_id);",
+									"    console.log('✅ Order ID saved: ' + jsonData.order_id);",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Nguyễn Văn Test\",\n    \"phone\": \"0901234567\",\n    \"address\": \"123 Đường Lê Lợi, Quận 1, TP.HCM\",\n    \"payment_method\": \"Chuyển khoản ngân hàng\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/orders",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"orders"
+							]
+						},
+						"description": "POST /api/orders\n\n🔒 Yêu cầu token.\nTạo đơn hàng từ giỏ hàng hiện tại. Giỏ hàng sẽ tự động được xóa sau khi đặt hàng thành công.\n\n⚠️ Phải có sản phẩm trong giỏ hàng trước khi gọi!"
+					}
+				},
+				{
+					"name": "Danh sách đơn hàng",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/orders",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"orders"
+							]
+						},
+						"description": "GET /api/orders\n\n🔒 Yêu cầu token.\n- Admin: xem tất cả đơn hàng\n- User: chỉ xem đơn hàng của chính mình"
+					}
+				},
+				{
+					"name": "Chi tiết đơn hàng",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/orders/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"orders",
+								"1"
+							]
+						},
+						"description": "GET /api/orders/{id}\n\n🔒 Yêu cầu token.\nXem chi tiết đơn hàng kèm danh sách sản phẩm đã đặt."
+					}
+				},
+				{
+					"name": "Cập nhật trạng thái ĐH (Admin)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"Đang giao hàng\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/orders/1/status",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"orders",
+								"1",
+								"status"
+							]
+						},
+						"description": "PUT /api/orders/{id}/status\n\n🔒 Yêu cầu token Admin.\nCập nhật trạng thái đơn hàng.\n\n**Các trạng thái hợp lệ:**\n- Đang xử lý\n- Đang giao hàng\n- Đã giao\n- Đã hủy"
+					}
+				},
+				{
+					"name": "Thanh toán đơn hàng",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"payment_method\": \"Chuyển khoản ngân hàng\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/orders/1/payment",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"orders",
+								"1",
+								"payment"
+							]
+						},
+						"description": "POST /api/orders/{id}/payment\n\n🔒 Yêu cầu token.\nXử lý thanh toán giả lập (simulated).\n\n**Phương thức thanh toán:**\n- COD (Thanh toán khi nhận hàng)\n- Chuyển khoản ngân hàng\n- Ví điện tử\n\n⚠️ Không thể thanh toán lại đơn đã thanh toán."
+					}
+				},
+				{
+					"name": "Thanh toán COD",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"payment_method\": \"COD\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/orders/1/payment",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"orders",
+								"1",
+								"payment"
+							]
+						},
+						"description": "POST /api/orders/{id}/payment\n\n🔒 Yêu cầu token.\nThanh toán bằng COD (Cash on Delivery)."
+					}
+				},
+				{
+					"name": "Hủy đơn hàng",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/orders/1/cancel",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"orders",
+								"1",
+								"cancel"
+							]
+						},
+						"description": "PUT /api/orders/{id}/cancel\n\n🔒 Yêu cầu token.\n- User: chỉ hủy được đơn ở trạng thái \"Đang xử lý\"\n- Admin: hủy được mọi đơn hàng"
+					}
+				},
+				{
+					"name": "❌ Test: Đặt hàng - Giỏ trống",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Test\",\n    \"phone\": \"0901234567\",\n    \"address\": \"Test Address\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/orders",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"orders"
+							]
+						},
+						"description": "🧪 Test: Đặt hàng khi giỏ hàng trống → Expected: 400 Bad Request."
+					}
+				},
+				{
+					"name": "❌ Test: Đặt hàng - Thiếu thông tin",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"\",\n    \"phone\": \"\",\n    \"address\": \"\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/orders",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"orders"
+							]
+						},
+						"description": "🧪 Test: Đặt hàng thiếu họ tên, SĐT, địa chỉ → Expected: 400 Bad Request."
+					}
+				},
+				{
+					"name": "❌ Test: Thanh toán lại đơn đã TT",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"payment_method\": \"Chuyển khoản ngân hàng\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/orders/1/payment",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"orders",
+								"1",
+								"payment"
+							]
+						},
+						"description": "🧪 Test: Thanh toán lại đơn hàng đã thanh toán rồi → Expected: 400 Bad Request (Double payment prevention)."
+					}
+				}
+			]
+		}
+	]
+}
